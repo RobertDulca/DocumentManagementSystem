@@ -6,6 +6,7 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/at/fhtw/swkom/paperless/pom.xml" />
+        <option value="$PROJECT_DIR$/at/fhtw/swkom/paperless/rest/pom.xml" />
       </list>
     </option>
   </component>
