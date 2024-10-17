@@ -2,19 +2,19 @@ Id;1
 Name;"Student
 Hi"
 Description;Source-Code ZIP Archive Submission
-TotalGrade;83.00
+TotalGrade;100.00
 
 1.1 Provided Submission / Git Repo;10.00;OK Repo URL is file:/mnt/c/Users/dpr20/Documents/FHTW%20Bachelor/Semester%205/SWKOM/DocumentManagementSystem/paperless/rest/./
 1.2 Extracted ZIP / Git clone;10.00;OK 
 2. Application Build ok (without tests);10.00;OK openapi-spring-1.0.0.jar was already built
 3.2 Static File Checks: pom.xml;4.00;OK
-3.1 Static File Checks: *.java;14.00;File at/fhtw/swkom/paperless/services/OpenApiGeneratorApplication.java is still existing! (-2.00)
-3.2 Static Sourcecode Checks;18.00;Content of file OpenApiGeneratorApplication.java does not contain 'package at.fhtw.swkom.paperless;' ! (-2.00)
-4. Application Tests ok (Spring Boot Context);0.00;FAIL - Maven package with tests failed!
+3.1 Static File Checks: *.java;16.00;OK
+3.2 Static Sourcecode Checks;20.00;OK
+4. Application Tests ok (Spring Boot Context);10.00;OK openapi-spring-1.0.0.jar successfully ran goal package and tested
 5. Module-Tests (Start Spring Boot server);3.00;OK openapi-spring-1.0.0.jar successfully ran goal spring-boot:start
 5.1 POST http://localhost:8081/api/documents/post_document;3.00;OK POST http://localhost:8081/api/documents/post_document returns 201
 5.2 GET http://localhost:8081/api/documents;3.00;OK GET http://localhost:8081/api/documents returns 200
 5.3 GET http://localhost:8081/api/documents/1;3.00;OK GET http://localhost:8081/api/documents/1 returns 200
-5.4 PUT http://localhost:8081/api/documents/1;0.00;FAIL - Response-Status of PUT http://localhost:8081/api/documents/1 is 501 (expected pattern '(2[0-9]{2})')!
+5.4 PUT http://localhost:8081/api/documents/1;3.00;OK PUT http://localhost:8081/api/documents/1 returns 201
 5.5 DELETE http://localhost:8081/api/documents/1;3.00;OK DELETE http://localhost:8081/api/documents/1 returns 204
 5. Module-Tests done (Stop Spring Boot server);2.00;OK openapi-spring-1.0.0.jar successfully ran goal spring-boot:stop

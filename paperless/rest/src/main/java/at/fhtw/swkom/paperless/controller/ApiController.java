@@ -72,4 +72,8 @@ public class ApiController implements ApiApi {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @Override
+    public ResponseEntity<Void> updateDocument(Integer id) {
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }
