@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="rest" />
         <module name="DocumentManagementSystem" />
+        <module name="openapi-spring" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -16,6 +17,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="openapi-spring" options="-parameters" />
       <module name="paperless-rest" options="" />
       <module name="rest" options="-parameters" />
     </option>

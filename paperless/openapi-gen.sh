@@ -2,7 +2,7 @@
 #
 # Spring Generator Configuration-Parameters reference, see https://openapi-generator.tech/docs/generators/spring/
 #
-docker run --name openapi-gen -v ${PWD}:/local openapitools/openapi-generator-cli generate \
+docker run --name openapi-gen -v "${PWD}":/local openapitools/openapi-generator-cli generate \
   -i /local/openapi.yaml -g spring \
   -p pocoModels=true -p useSeperateModelProject=true \
   --package-name at.fhtw.swkom.paperless \

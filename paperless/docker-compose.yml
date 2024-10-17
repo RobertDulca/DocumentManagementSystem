@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  rest:
+    build: ./rest/
+    container_name: paperless-rest
+    restart: unless-stopped
+    ports:
+      - "8081:8081"

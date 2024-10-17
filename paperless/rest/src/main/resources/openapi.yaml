@@ -81,6 +81,25 @@ paths:
       summary: Retrieve a document by id
       x-accepts:
       - application/json
+    put:
+      operationId: updateDocument
+      parameters:
+      - description: The id of the Document
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: Document updated successfully
+        "404":
+          description: Document does not exist with this id!
+      summary: Update a document by id
+      x-accepts:
+      - application/json
 components:
   schemas:
     document:

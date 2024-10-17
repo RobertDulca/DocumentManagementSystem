@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-16T19:41:45.793122307Z[Etc/UTC]", comments = "Generator version: 7.10.0-SNAPSHOT")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-17T08:44:06.510922473Z[Etc/UTC]", comments = "Generator version: 7.10.0-SNAPSHOT")
 @Validated
 @Tag(name = "api", description = "the api API")
 public interface ApiApi {
@@ -171,6 +171,34 @@ public interface ApiApi {
     default ResponseEntity<Void> postDocument(
         @Parameter(name = "document", description = "") @Valid @RequestParam(value = "document", required = false) String document,
         @Parameter(name = "file", description = "") @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /api/documents/{id} : Update a document by id
+     *
+     * @param id The id of the Document (required)
+     * @return Document updated successfully (status code 200)
+     *         or Document does not exist with this id! (status code 404)
+     */
+    @Operation(
+        operationId = "updateDocument",
+        summary = "Update a document by id",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Document updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Document does not exist with this id!")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/api/documents/{id}"
+    )
+    
+    default ResponseEntity<Void> updateDocument(
+        @Parameter(name = "id", description = "The id of the Document", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

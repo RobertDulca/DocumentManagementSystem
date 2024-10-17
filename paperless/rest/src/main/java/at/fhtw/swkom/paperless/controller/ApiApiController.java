@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-16T19:41:45.793122307Z[Etc/UTC]", comments = "Generator version: 7.10.0-SNAPSHOT")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-17T08:44:06.510922473Z[Etc/UTC]", comments = "Generator version: 7.10.0-SNAPSHOT")
 @Controller
 @RequestMapping("${openapi.paperlessRESTServer.base-path:}")
 public class ApiApiController implements ApiApi {
@@ -82,4 +82,5 @@ public class ApiApiController implements ApiApi {
     public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
 }
