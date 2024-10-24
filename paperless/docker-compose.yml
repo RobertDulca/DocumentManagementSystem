@@ -7,3 +7,10 @@ services:
     restart: unless-stopped
     ports:
       - "8081:8081"
+  ui:
+    build: ui/
+    restart: unless-stopped
+    ports:
+      - "80:80"
+
+
