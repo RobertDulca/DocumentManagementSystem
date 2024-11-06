@@ -1,4 +1,5 @@
 CREATE DATABASE paperlessdb;
+\c paperlessdb;
 CREATE TABLE document (
                           id SERIAL PRIMARY KEY,
                           title VARCHAR(255),
