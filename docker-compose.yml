@@ -9,6 +9,7 @@ services:
       - "8081:8081"
   ui:
     build: ui
+    container_name: paperless-ui
     restart: unless-stopped
     ports:
       - "80:80"
