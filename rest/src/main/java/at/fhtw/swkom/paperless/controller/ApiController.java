@@ -1,6 +1,6 @@
 package at.fhtw.swkom.paperless.controller;
 
-import at.fhtw.swkom.paperless.services.dto.Document;
+import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +39,8 @@ public class ApiController implements ApiApi {
     }
 
     @Override
-    public ResponseEntity<Document> getDocument(Integer id) {
-        Document document = new Document();
+    public ResponseEntity<DocumentDTO> getDocument(Integer id) {
+        DocumentDTO document = new DocumentDTO();
         document.setId(id);
         document.setTitle("Hardcoded Document Name");
         document.setAuthor("Peter");
@@ -49,14 +49,14 @@ public class ApiController implements ApiApi {
     }
 
     @Override
-    public ResponseEntity<List<Document>> getDocuments() {
-        List<Document> documents = new ArrayList<>();
-        Document doc1 = new Document();
+    public ResponseEntity<List<DocumentDTO>> getDocuments() {
+        List<DocumentDTO> documents = new ArrayList<>();
+        DocumentDTO doc1 = new DocumentDTO();
         doc1.setId(1);
         doc1.setTitle("Document 1");
         doc1.setAuthor("Peter 1");
 
-        Document doc2 = new Document();
+        DocumentDTO doc2 = new DocumentDTO();
         doc2.setId(2);
         doc2.setTitle("Document 2");
         doc2.setAuthor("Peter 2");
