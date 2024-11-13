@@ -9,8 +9,13 @@ var client = {
             .then(response => handleResponse(response))
             .then((text) => text.length ? JSON.parse(text) : {});
     },
-    post: function(url, body, options) {
-        return fetch(url, { method: 'POST', body: JSON.stringify(body), headers: options })
+    post: function(url, body, options = {}) {
+        const headers = body instanceof FormData ? options : { 'Content-Type': 'application/json', ...options };
+        return fetch(url, {
+            method: 'POST',
+            body: body instanceof FormData ? body : JSON.stringify(body),
+            headers
+        })
             .then(response => handleResponse(response))
             .then((text) => text.length ? JSON.parse(text) : {});
     },
