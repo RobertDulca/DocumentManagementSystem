@@ -9,7 +9,7 @@ public class DocumentService {
 
     private DocumentRepository documentRepository;
 
-    public DocumentEntity save(DocumentEntity documentDTO) {
-        return documentRepository.save(documentDTO);
+    public DocumentEntity save(DocumentEntity documentEntity) {
+        return documentRepository.save(documentEntity);
     }
 }

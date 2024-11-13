@@ -19,12 +19,12 @@ import jakarta.annotation.Generated;
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-17T08:44:06.510922473Z[Etc/UTC]", comments = "Generator version: 7.10.0-SNAPSHOT")
 @Controller
 @RequestMapping("${openapi.paperlessRESTServer.base-path:}")
-public class ApiController implements ApiApi {
+public class DocumentController implements ApiApi {
 
     private final NativeWebRequest request;
 
     @Autowired
-    public ApiController(NativeWebRequest request) {
+    public DocumentController(NativeWebRequest request) {
         this.request = request;
     }
 

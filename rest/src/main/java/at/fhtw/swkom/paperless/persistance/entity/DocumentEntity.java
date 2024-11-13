@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode
-@Table(name = "Documents")
+@Table(name = "documents")
 public class DocumentEntity {
 
     @Id
