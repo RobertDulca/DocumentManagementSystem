@@ -21,6 +21,7 @@ services:
       - paperless
   db:
     build: db/.
+    container_name: paperless-db
     ports:
       - '5432:5432'
     healthcheck:
