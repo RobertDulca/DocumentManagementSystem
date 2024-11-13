@@ -1,4 +1,4 @@
-package at.fhtw.swkom.paperless.persistance.entity;
+package at.fhtw.swkom.paperless.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

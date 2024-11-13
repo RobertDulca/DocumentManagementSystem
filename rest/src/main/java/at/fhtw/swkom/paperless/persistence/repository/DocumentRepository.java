@@ -1,6 +1,6 @@
-package at.fhtw.swkom.paperless.persistance.repository;
+package at.fhtw.swkom.paperless.persistence.repository;
 
-import at.fhtw.swkom.paperless.persistance.entity.DocumentEntity;
+import at.fhtw.swkom.paperless.persistence.entity.DocumentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

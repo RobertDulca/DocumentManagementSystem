@@ -1,7 +1,7 @@
 package at.fhtw.swkom.paperless.services;
 
-import at.fhtw.swkom.paperless.persistance.entity.DocumentEntity;
-import at.fhtw.swkom.paperless.persistance.repository.DocumentRepository;
+import at.fhtw.swkom.paperless.persistence.entity.DocumentEntity;
+import at.fhtw.swkom.paperless.persistence.repository.DocumentRepository;
 import org.springframework.stereotype.Service;
 
 @Service
