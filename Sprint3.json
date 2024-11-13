@@ -1,0 +1,227 @@
+{
+  "courseName" : "BIF5-SWKOM-WS24_L2L3",
+  "assignmentName" : "Sprint3",
+  "tasks" : [ {
+    "title" : "1.1 Provided Submission / Git Repo",
+    "className" : "CheckRepoUrlValid",
+    "maxGrade" : 5.0,
+    "withGrading" : true,
+    "parameters" : [ ]
+  }, {
+    "title" : "1.2 Extracted ZIP / Git clone",
+    "className" : "CheckRepoClone",
+    "maxGrade" : 5.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "overwriteExisting",
+      "value" : true
+    } ]
+  }, {
+    "title" : "2. Application Build ok (without tests)",
+    "className" : "CheckMavenBuild",
+    "maxGrade" : 5.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "skipTests",
+      "value" : true
+    }, {
+      "name" : "rebuildExisting",
+      "value" : false
+    } ]
+  }, {
+    "title" : "3.1 File Checks: pom.xml",
+    "className" : "CheckSourceFiles",
+    "maxGrade" : 14.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "setRootPath",
+      "value" : "/"
+    }, {
+      "name" : "selectFile",
+      "value" : "pom.xml"
+    }, {
+      "name" : "containsText",
+      "value" : "<artifactId>spring-data-commons</artifactId>"
+    }, {
+      "name" : "containsText",
+      "value" : "<artifactId>spring-boot-starter-test</artifactId>"
+    }, {
+      "name" : "containsText",
+      "value" : "<artifactId>spring-boot-starter-data-jpa</artifactId>"
+    }, {
+      "name" : "containsText",
+      "value" : "<artifactId>postgresql</artifactId>"
+    }, {
+      "name" : "containsText",
+      "value" : "<artifactId>jakarta.persistence-api</artifactId>"
+    }, {
+      "name" : "containsText",
+      "value" : "<artifactId>mapstruct</artifactId>"
+    } ]
+  }, {
+    "title" : "3.2 File Checks: docker-compose.yml",
+    "className" : "CheckSourceFiles",
+    "maxGrade" : 6.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "setRootPath",
+      "value" : "/"
+    }, {
+      "name" : "selectFile",
+      "value" : "docker-compose.yml"
+    }, {
+      "name" : "containsText",
+      "value" : "db:"
+    }, {
+      "name" : "containsText",
+      "value" : "5432:5432"
+    } ]
+  }, {
+    "title" : "3.3 File Checks: application.properties",
+    "className" : "CheckSourceFiles",
+    "maxGrade" : 6.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "selectFile",
+      "value" : "application.properties"
+    }, {
+      "name" : "containsText",
+      "value" : "spring.datasource.url"
+    }, {
+      "name" : "containsText",
+      "value" : "spring.jpa.hibernate.ddl-auto"
+    } ]
+  }, {
+    "title" : "3.4 Static File Checks: *.java",
+    "className" : "CheckSourceFiles",
+    "maxGrade" : 14.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "sourceCheckPackagePresent",
+      "value" : "at.fhtw.swkom.paperless.persistence"
+    }, {
+      "name" : "sourceCheckPackagePresent",
+      "value" : "at.fhtw.swkom.paperless.persistence.entities"
+    }, {
+      "name" : "sourceCheckPackagePresent",
+      "value" : "at.fhtw.swkom.paperless.persistence.repositories"
+    }, {
+      "name" : "sourceCheckPackagePresent",
+      "value" : "at.fhtw.swkom.paperless.services.mappers"
+    }, {
+      "name" : "sourceCheckFilePresent",
+      "value" : "at/fhtw/swkom/paperless/persistence/entities/Document.java"
+    }, {
+      "name" : "sourceCheckFilePresent",
+      "value" : "at/fhtw/swkom/paperless/persistence/repositories/DocumentRepository.java"
+    }, {
+      "name" : "sourceCheckFilePresent",
+      "value" : "at/fhtw/swkom/paperless/services/mappers/DocumentMapper.java"
+    } ]
+  }, {
+    "title" : "4. Application Tests ok (Spring Boot Context)",
+    "className" : "CheckMavenBuild",
+    "maxGrade" : 10.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "skipTests",
+      "value" : false
+    }, {
+      "name" : "rebuildExisting",
+      "value" : false
+    } ]
+  }, {
+    "title" : "5. Component-Tests (docker compose up)",
+    "className" : "CheckDockerCompose",
+    "maxGrade" : 15.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "command",
+      "value" : "up"
+    }, {
+      "name" : "param",
+      "value" : "-d"
+    } ]
+  }, {
+    "title" : "5. Wait 60s for all containers to start",
+    "className" : "CheckWait",
+    "maxGrade" : 0.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "waitSeconds",
+      "value" : 60
+    } ]
+  }, {
+    "title" : "5.1 Rest-API POST http://localhost/api/documents/post_document",
+    "className" : "CheckHttpRequest",
+    "maxGrade" : 10.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "requestMethod",
+      "value" : "POST"
+    }, {
+      "name" : "baseUrl",
+      "value" : "http://localhost"
+    }, {
+      "name" : "requestEndpoint",
+      "value" : "/api/documents/post_document"
+    }, {
+      "name" : "requestContentString",
+      "value" : "Sprint3Document"
+    }, {
+      "name" : "requestContentFile",
+      "value" : "HelloWorld.pdf"
+    }, {
+      "name" : "responseStatusCodePattern",
+      "value" : "(2[0-9]{2})"
+    } ]
+  }, {
+    "title" : "5.2 Rest-API POST http://localhost/api/documents/post_document",
+    "className" : "CheckHttpRequest",
+    "maxGrade" : 10.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "requestMethod",
+      "value" : "POST"
+    }, {
+      "name" : "baseUrl",
+      "value" : "http://localhost"
+    }, {
+      "name" : "requestEndpoint",
+      "value" : "/api/documents/post_document"
+    }, {
+      "name" : "requestContentString",
+      "value" : "Sprint3Document"
+    }, {
+      "name" : "requestContentFile",
+      "value" : "HelloWorld.pdf"
+    }, {
+      "name" : "responseStatusCodePattern",
+      "value" : "(2[0-9]{2})"
+    } ]
+  }, {
+    "title" : "5.2 Database SELECT * FROM documents WHERE title='Sprint3Document'",
+    "className" : "CheckDatabase",
+    "maxGrade" : 10.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "connect",
+      "value" : "jdbc:postgresql://localhost:5432/paperlessdb?user=postgres&password=postgres"
+    }, {
+      "name" : "executeQuery",
+      "value" : "SELECT * FROM document WHERE title='Sprint3Document'"
+    }, {
+      "name" : "hasRows",
+      "value" : true
+    } ]
+  }, {
+    "title" : "5.x Component-Tests done (docker compose down)",
+    "className" : "CheckDockerCompose",
+    "maxGrade" : 5.0,
+    "withGrading" : true,
+    "parameters" : [ {
+      "name" : "command",
+      "value" : "down"
+    } ]
+  } ]
+}
