@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode
-@Table(name = "documents")
 public class DocumentEntity {
 
     @Id
