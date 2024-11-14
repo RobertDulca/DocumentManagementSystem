@@ -6,6 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, componentModel = "spring")
 public interface DocumentMapper {
     DocumentMapper INSTANCE = Mappers.getMapper(DocumentMapper.class);
@@ -13,5 +15,6 @@ public interface DocumentMapper {
     DocumentEntity dtoToEntity(DocumentDTO dto);
 
     DocumentDTO entityToDto(DocumentEntity entity);
+    List<DocumentDTO> entityListToDtoList(List<DocumentEntity> entities);
 
 }

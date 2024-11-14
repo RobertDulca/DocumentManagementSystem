@@ -3,12 +3,16 @@
     import { onMount } from 'svelte';
   
     let documentTitle = '';
+    let content = '';
+    let createdAt = '';
     let file;
     let message = '';
   
     async function handleUpload() {
       const formData = new FormData();
       formData.append('document', documentTitle);
+      formData.append('content', content);
+      formData.append('createdAt', createdAt);
       formData.append('file', file);
   
       try {
@@ -29,6 +33,14 @@
       <div class="form-group">
         <label for="documentTitle">Document Title</label>
         <input type="text" class="form-control" bind:value={documentTitle} required />
+      </div>
+      <div class="form-group">
+        <label for="content">Content</label>
+        <input type="text" class="form-control" bind:value={content} required />
+      </div>
+      <div class="form-group">
+        <label for="createdAt">CreatedAt</label>
+        <input type="text" class="form-control" bind:value={createdAt} required />
       </div>
       <div class="form-group">
         <label for="fileInput">Select File</label>

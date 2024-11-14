@@ -1,15 +1,21 @@
 package at.fhtw.swkom.paperless.services;
 
-import at.fhtw.swkom.paperless.persistence.entity.DocumentEntity;
-import at.fhtw.swkom.paperless.persistence.repository.DocumentRepository;
-import org.springframework.stereotype.Service;
+import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
+import org.springframework.web.multipart.MultipartFile;
 
-@Service
-public class DocumentService {
+import java.util.List;
+import java.util.Optional;
 
-    private DocumentRepository documentRepository;
+public interface DocumentService {
+    void init();
 
-    public DocumentEntity save(DocumentEntity documentEntity) {
-        return documentRepository.save(documentEntity);
-    }
+    void store(String document, MultipartFile file);
+
+    List<DocumentDTO> loadAll();
+
+    DocumentDTO load(Integer id);
+
+    void delete(Integer id);
+
+    void update(Integer id, DocumentDTO documentDTO);
 }

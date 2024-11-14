@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode
 public class DocumentEntity {
 
     @Id
@@ -20,6 +19,5 @@ public class DocumentEntity {
     private String title;
     private String content;
     private LocalDateTime createdAt;
-    private LocalDateTime modified;
 }
 

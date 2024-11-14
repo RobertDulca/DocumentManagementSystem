@@ -20,7 +20,7 @@ public class DocumentDTO {
 
     private String title;
 
-    private String author;
+    private String content;
 
     private String created;
 
@@ -78,7 +78,7 @@ public class DocumentDTO {
     }
 
     public DocumentDTO author(String author) {
-        this.author = author;
+        this.content = author;
         return this;
     }
 
@@ -90,12 +90,12 @@ public class DocumentDTO {
 
     @Schema(name = "author", description = "The author of the document's contents", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @JsonProperty("author")
-    public String getAuthor() {
-        return author;
+    public String getContent() {
+        return content;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public DocumentDTO created(String created) {
@@ -130,13 +130,13 @@ public class DocumentDTO {
         DocumentDTO document = (DocumentDTO) o;
         return Objects.equals(this.id, document.id) &&
                 Objects.equals(this.title, document.title) &&
-                Objects.equals(this.author, document.author) &&
+                Objects.equals(this.content, document.content) &&
                 Objects.equals(this.created, document.created);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, author, created);
+        return Objects.hash(id, title, content, created);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class DocumentDTO {
         sb.append("class Document {\n");
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    title: ").append(toIndentedString(title)).append("\n");
-        sb.append("    author: ").append(toIndentedString(author)).append("\n");
+        sb.append("    author: ").append(toIndentedString(content)).append("\n");
         sb.append("    created: ").append(toIndentedString(created)).append("\n");
         sb.append("}");
         return sb.toString();

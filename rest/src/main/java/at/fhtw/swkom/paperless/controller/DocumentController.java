@@ -1,5 +1,7 @@
 package at.fhtw.swkom.paperless.controller;
 
+import at.fhtw.swkom.paperless.services.DocumentService;
+import at.fhtw.swkom.paperless.services.DocumentServiceImpl;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 
 
@@ -8,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.context.request.NativeWebRequest;
 
@@ -17,15 +20,17 @@ import java.util.Optional;
 import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-17T08:44:06.510922473Z[Etc/UTC]", comments = "Generator version: 7.10.0-SNAPSHOT")
-@Controller
+@RestController
 @RequestMapping("${openapi.paperlessRESTServer.base-path:}")
 public class DocumentController implements ApiApi {
 
     private final NativeWebRequest request;
+    private final DocumentService documentService;
 
     @Autowired
-    public DocumentController(NativeWebRequest request) {
+    public DocumentController(NativeWebRequest request, DocumentService documentService) {
         this.request = request;
+        this.documentService = documentService;
     }
 
     @Override
@@ -35,45 +40,40 @@ public class DocumentController implements ApiApi {
 
     @Override
     public ResponseEntity<Void> deleteDocument(Integer id) {
+        documentService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
     public ResponseEntity<DocumentDTO> getDocument(Integer id) {
-        DocumentDTO document = new DocumentDTO();
-        document.setId(id);
-        document.setTitle("Hardcoded Document Name");
-        document.setAuthor("Peter");
-
+        DocumentDTO document = documentService.load(id);
         return new ResponseEntity<>(document, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<List<DocumentDTO>> getDocuments() {
-        List<DocumentDTO> documents = new ArrayList<>();
-        DocumentDTO doc1 = new DocumentDTO();
-        doc1.setId(1);
-        doc1.setTitle("Document 1");
-        doc1.setAuthor("Peter 1");
-
-        DocumentDTO doc2 = new DocumentDTO();
-        doc2.setId(2);
-        doc2.setTitle("Document 2");
-        doc2.setAuthor("Peter 2");
-
-        documents.add(doc1);
-        documents.add(doc2);
-
+        List<DocumentDTO> documents = documentService.loadAll();
         return new ResponseEntity<>(documents, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        if (document == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            documentService.store(document, file);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public ResponseEntity<Void> updateDocument(Integer id) {
+        DocumentDTO documentDTO = new DocumentDTO();
+        documentService.update(id, documentDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
