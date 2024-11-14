@@ -17,7 +17,11 @@ public class DocumentEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String title;
-    private String content;
     private LocalDateTime createdAt;
+
+    public DocumentEntity(String document, Object o) {
+        this.title = document;
+        this.createdAt = LocalDateTime.now();
+    }
 }
 

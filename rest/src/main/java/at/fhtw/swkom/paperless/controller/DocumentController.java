@@ -1,23 +1,19 @@
 package at.fhtw.swkom.paperless.controller;
 
+import at.fhtw.swkom.paperless.persistence.entity.DocumentEntity;
 import at.fhtw.swkom.paperless.services.DocumentService;
-import at.fhtw.swkom.paperless.services.DocumentServiceImpl;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
-
-
+import jakarta.annotation.Generated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-17T08:44:06.510922473Z[Etc/UTC]", comments = "Generator version: 7.10.0-SNAPSHOT")
 @RestController
@@ -58,11 +54,12 @@ public class DocumentController implements ApiApi {
 
     @Override
     public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
+        DocumentEntity documentEntity = new DocumentEntity(document, null);
         if (document == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
-            documentService.store(document, file);
+            documentService.store(documentEntity);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
