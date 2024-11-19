@@ -1,9 +1,9 @@
 package at.fhtw.swkom.paperless.services;
 
-import at.fhtw.swkom.paperless.persistence.entity.DocumentEntity;
-import at.fhtw.swkom.paperless.persistence.repository.DocumentRepository;
+import at.fhtw.swkom.paperless.persistence.entities.Document;
+import at.fhtw.swkom.paperless.persistence.repositories.DocumentRepository;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
-import at.fhtw.swkom.paperless.services.mapper.DocumentMapper;
+import at.fhtw.swkom.paperless.services.mappers.DocumentMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void store(DocumentEntity documentEntity) {
+    public void store(Document documentEntity) {
         documentRepository.save(documentEntity);
     }
 

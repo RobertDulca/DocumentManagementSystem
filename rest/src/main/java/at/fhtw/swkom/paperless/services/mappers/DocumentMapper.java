@@ -1,6 +1,6 @@
-package at.fhtw.swkom.paperless.services.mapper;
+package at.fhtw.swkom.paperless.services.mappers;
 
-import at.fhtw.swkom.paperless.persistence.entity.DocumentEntity;
+import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -12,9 +12,9 @@ import java.util.List;
 public interface DocumentMapper {
     DocumentMapper INSTANCE = Mappers.getMapper(DocumentMapper.class);
 
-    DocumentEntity dtoToEntity(DocumentDTO dto);
+    Document dtoToEntity(DocumentDTO dto);
 
-    DocumentDTO entityToDto(DocumentEntity entity);
-    List<DocumentDTO> entityListToDtoList(List<DocumentEntity> entities);
+    DocumentDTO entityToDto(Document entity);
+    List<DocumentDTO> entityListToDtoList(List<Document> entities);
 
 }

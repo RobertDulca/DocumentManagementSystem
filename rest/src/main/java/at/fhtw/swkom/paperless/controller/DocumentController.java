@@ -1,6 +1,6 @@
 package at.fhtw.swkom.paperless.controller;
 
-import at.fhtw.swkom.paperless.persistence.entity.DocumentEntity;
+import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.services.DocumentService;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import jakarta.annotation.Generated;
@@ -54,7 +54,7 @@ public class DocumentController implements ApiApi {
 
     @Override
     public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
-        DocumentEntity documentEntity = new DocumentEntity(document, null);
+        Document documentEntity = new Document(document, null);
         if (document == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

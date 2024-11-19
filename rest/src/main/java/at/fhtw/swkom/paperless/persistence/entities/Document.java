@@ -1,4 +1,4 @@
-package at.fhtw.swkom.paperless.persistence.entity;
+package at.fhtw.swkom.paperless.persistence.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DocumentEntity {
+public class Document {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,7 +19,7 @@ public class DocumentEntity {
     private String title;
     private LocalDateTime createdAt;
 
-    public DocumentEntity(String document, Object o) {
+    public Document(String document, Object o) {
         this.title = document;
         this.createdAt = LocalDateTime.now();
     }
