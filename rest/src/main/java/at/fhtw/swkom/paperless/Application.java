@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableJpaRepositories("at.fhtw.swkom.paperless.persistence.repositories")
-@EntityScan("at.fhtw.swkom.paperless.persistence.entity")
+@EntityScan("at.fhtw.swkom.paperless.persistence.entities")
 @ComponentScan(
     basePackages = {"at.fhtw.swkom.paperless.services", "at.fhtw.swkom.paperless.controller" , "at.fhtw.swkom.paperless.config", "at.fhtw.swkom.paperless.persistence"}
 )
