@@ -3,7 +3,9 @@ version: '3.8'
 services:
   db:
     build: db/.
+    restart: always
     container_name: paperless-db
+    hostname: db
     ports:
       - '5432:5432'
     healthcheck:
@@ -20,6 +22,7 @@ services:
   rest:
     build: rest
     container_name: paperless-rest
+    hostname: rest
     restart: unless-stopped
     ports:
       - "8081:8081"
@@ -33,9 +36,14 @@ services:
       - db
     networks:
       - paperless
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/paperlessdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
   ui:
     build: ui
     container_name: paperless-ui
+    hostname: ui
     restart: unless-stopped
     ports:
       - "80:80"
