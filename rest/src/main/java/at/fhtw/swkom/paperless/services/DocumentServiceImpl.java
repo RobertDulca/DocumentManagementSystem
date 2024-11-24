@@ -4,10 +4,10 @@ import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.persistence.repositories.DocumentRepository;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import at.fhtw.swkom.paperless.services.mappers.DocumentMapper;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
