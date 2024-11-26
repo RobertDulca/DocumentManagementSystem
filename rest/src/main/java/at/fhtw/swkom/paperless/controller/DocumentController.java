@@ -54,7 +54,7 @@ public class DocumentController implements ApiApi {
 
     @Override
     public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
-        Document documentEntity = new Document(document, null);
+        Document documentEntity = new Document(document);
         if (document == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

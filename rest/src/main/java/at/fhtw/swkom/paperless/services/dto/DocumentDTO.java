@@ -1,28 +1,28 @@
 package at.fhtw.swkom.paperless.services.dto;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Generated;
-import jakarta.validation.constraints.NotNull;
 
-import java.util.Objects;
+
+import jakarta.annotation.Generated;
 
 /**
  * Document
  */
 
 @JsonTypeName("document")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-17T08:44:06.510922473Z[Etc/UTC]", comments = "Generator version: 7.10.0-SNAPSHOT")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T19:49:30.564802578Z[Etc/UTC]", comments = "Generator version: 7.10.0-SNAPSHOT")
 public class DocumentDTO {
 
     private Integer id;
 
     private String title;
 
-    private String content;
-
-    private String created;
+    private LocalDateTime createdAt;
 
     public DocumentDTO() {
         super();
@@ -42,7 +42,6 @@ public class DocumentDTO {
 
     /**
      * The id of the document
-     *
      * @return id
      */
 
@@ -63,7 +62,6 @@ public class DocumentDTO {
 
     /**
      * The title of the document
-     *
      * @return title
      */
     @NotNull
@@ -77,46 +75,24 @@ public class DocumentDTO {
         this.title = title;
     }
 
-    public DocumentDTO author(String author) {
-        this.content = author;
-        return this;
-    }
-
-    /**
-     * The author of the document's contents
-     *
-     * @return author
-     */
-
-    @Schema(name = "author", description = "The author of the document's contents", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("author")
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public DocumentDTO created(String created) {
-        this.created = created;
+    public DocumentDTO created(LocalDateTime created) {
+        this.createdAt = created;
         return this;
     }
 
     /**
      * Get created
-     *
      * @return created
      */
 
     @Schema(name = "created", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @JsonProperty("created")
-    public String getCreated() {
-        return created;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated(String created) {
-        this.created = created;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     @Override
@@ -130,13 +106,12 @@ public class DocumentDTO {
         DocumentDTO document = (DocumentDTO) o;
         return Objects.equals(this.id, document.id) &&
                 Objects.equals(this.title, document.title) &&
-                Objects.equals(this.content, document.content) &&
-                Objects.equals(this.created, document.created);
+                Objects.equals(this.createdAt, document.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, content, created);
+        return Objects.hash(id, title, createdAt);
     }
 
     @Override
@@ -145,8 +120,7 @@ public class DocumentDTO {
         sb.append("class Document {\n");
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    title: ").append(toIndentedString(title)).append("\n");
-        sb.append("    author: ").append(toIndentedString(content)).append("\n");
-        sb.append("    created: ").append(toIndentedString(created)).append("\n");
+        sb.append("    created: ").append(toIndentedString(createdAt)).append("\n");
         sb.append("}");
         return sb.toString();
     }

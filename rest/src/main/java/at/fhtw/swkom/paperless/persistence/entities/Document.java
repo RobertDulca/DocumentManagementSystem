@@ -6,9 +6,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
+@NoArgsConstructor(force = true) // Ensures a no-args constructor
 @AllArgsConstructor
 @Builder
 public class Document {
@@ -19,8 +18,9 @@ public class Document {
     private String title;
     private LocalDateTime createdAt;
 
-    public Document(String document, Object o) {
-        this.title = document;
+    @Builder
+    public Document(String title) {
+        this.title = title;
         this.createdAt = LocalDateTime.now();
     }
 }
