@@ -57,14 +57,11 @@ public class DocumentController implements ApiApi {
 
     @Override
     public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
-        Document documentEntity = new Document(document, null);
-        int messageCount = 1;
+        Document documentEntity = new Document(document);
         if (document == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
-            String h = documentEntity.getTitle();
-            System.out.println(h);
             documentService.store(documentEntity);
             echoService.processMessage(document, messageCount);
             return new ResponseEntity<>(HttpStatus.CREATED);
