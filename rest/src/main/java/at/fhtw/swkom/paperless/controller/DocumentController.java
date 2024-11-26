@@ -3,6 +3,7 @@ package at.fhtw.swkom.paperless.controller;
 import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.services.DocumentService;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
+import at.fhtw.swkom.paperless.services.echo.EchoService;
 import jakarta.annotation.Generated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,11 +23,13 @@ public class DocumentController implements ApiApi {
 
     private final NativeWebRequest request;
     private final DocumentService documentService;
+    private final EchoService echoService;
 
     @Autowired
-    public DocumentController(NativeWebRequest request, DocumentService documentService) {
+    public DocumentController(NativeWebRequest request, DocumentService documentService, EchoService echoService) {
         this.request = request;
         this.documentService = documentService;
+        this.echoService = echoService;
     }
 
     @Override
@@ -55,11 +58,15 @@ public class DocumentController implements ApiApi {
     @Override
     public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
         Document documentEntity = new Document(document, null);
+        int messageCount = 1;
         if (document == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
+            String h = documentEntity.getTitle();
+            System.out.println(h);
             documentService.store(documentEntity);
+            echoService.processMessage(document, messageCount);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
