@@ -1,4 +1,4 @@
-package at.fhtw.swkom.paperless.services.dto;
+package at.fhtw.swkom.paperless.services.echo;
 
 import at.fhtw.swkom.paperless.config.RabbitMQConfig;
 import lombok.extern.slf4j.Slf4j;

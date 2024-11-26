@@ -7,7 +7,6 @@ import at.fhtw.swkom.paperless.services.mappers.DocumentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +35,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public DocumentDTO load(Integer id) {
-        return documentRepository.findById(id).map(entity -> documentMapper.INSTANCE.entityToDto(entity)).orElseThrow(() -> new EntityNotFoundException("Document with id " + id + " not found"));
+        return null;
     }
 
     @Override

@@ -51,12 +51,16 @@ services:
       - paperless
   queue:
     image: rabbitmq:3-management
+    restart: unless-stopped
+    container_name: queue-1
     ports:
       - 5672:5672
       - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: test
+      RABBITMQ_DEFAULT_PASS: test
     networks:
       - paperless
-
 
 networks:
   paperless:
