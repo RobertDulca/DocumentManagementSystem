@@ -20,7 +20,7 @@ public class EchoService {
 
     @RabbitListener(queues = RabbitMQConfig.ECHO_IN_QUEUE_NAME)
     public void processMessage(String message, @Header(RabbitMQConfig.ECHO_MESSAGE_COUNT_PROPERTY_NAME) int messageCount) {
-        // log.info("Recieved Message #{}: {}", messageCount, message);
+        System.out.println("Received Message #" + messageCount + ": " + message);
 
         // Delay
         try {

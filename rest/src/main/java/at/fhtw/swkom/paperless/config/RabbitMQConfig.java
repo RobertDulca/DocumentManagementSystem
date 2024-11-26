@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-    public static final String EXCHANGE = "";
 
     public static final String ECHO_IN_QUEUE_NAME = "Echo_In";
     public static final String ECHO_OUT_QUEUE_NAME = "Echo_Out";
@@ -28,9 +27,9 @@ public class RabbitMQConfig {
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory("queue-1");
-        connectionFactory.setUsername("guest");
-        connectionFactory.setPassword("guest");
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory("queue");
+        connectionFactory.setUsername("test");
+        connectionFactory.setPassword("test");
         return connectionFactory;
     }
 
