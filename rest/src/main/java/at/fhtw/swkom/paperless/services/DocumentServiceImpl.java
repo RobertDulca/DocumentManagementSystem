@@ -3,6 +3,7 @@ package at.fhtw.swkom.paperless.services;
 import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.persistence.repositories.DocumentRepository;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
+import at.fhtw.swkom.paperless.services.exception.StorageException;
 import at.fhtw.swkom.paperless.services.mappers.DocumentMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +31,14 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public void store(Document documentEntity) {
+        if (documentEntity == null){
+            throw new StorageException("No documentEntity found!");
+        }
         documentRepository.save(documentEntity);
     }
 
     @Override
     public List<DocumentDTO> loadAll() {
-        // Use the mapper to convert entities to DTOs
         return documentRepository.findAll()
                 .stream()
                 .map(documentMapper::entityToDto)
@@ -44,7 +47,6 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public DocumentDTO load(Integer id) {
-        // Find entity and map it to DTO
         return documentRepository.findById(id)
                 .map(documentMapper::entityToDto)
                 .orElseThrow(() -> new EntityNotFoundException("Document with ID " + id + " not found"));
@@ -60,13 +62,11 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public void update(Integer id, DocumentDTO documentDTO) {
-        // Find the existing entity
         Document existingDocument = documentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Document with ID " + id + " not found for update"));
 
-        // Use the mapper to update the entity
         Document updatedDocument = documentMapper.dtoToEntity(documentDTO);
-        updatedDocument.setId(existingDocument.getId()); // Ensure ID consistency
+        updatedDocument.setId(existingDocument.getId());
 
         documentRepository.save(updatedDocument);
     }
