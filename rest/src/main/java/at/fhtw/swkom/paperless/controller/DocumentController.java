@@ -4,8 +4,9 @@ import at.fhtw.swkom.paperless.config.RabbitMQConfig;
 import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.services.DocumentService;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
-import at.fhtw.swkom.paperless.services.echo.EchoService;
 import jakarta.annotation.Generated;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
@@ -26,6 +27,8 @@ import java.util.Optional;
 @RequestMapping("${openapi.paperlessRESTServer.base-path:}")
 public class DocumentController implements ApiApi {
 
+    private static final Logger logger = LogManager.getLogger(DocumentController.class);
+
     private final NativeWebRequest request;
     private final DocumentService documentService;
     private final RabbitTemplate rabbitTemplate;
@@ -44,36 +47,62 @@ public class DocumentController implements ApiApi {
 
     @Override
     public ResponseEntity<Void> deleteDocument(Integer id) {
-        documentService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        logger.info("Received request to delete document with ID: {}", id);
+        try {
+            documentService.delete(id);
+            logger.info("Successfully deleted document with ID: {}", id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            logger.error("Error occurred while deleting document with ID: {}", id, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public ResponseEntity<DocumentDTO> getDocument(Integer id) {
-        DocumentDTO document = documentService.load(id);
-        return new ResponseEntity<>(document, HttpStatus.OK);
+        logger.info("Received request to fetch document with ID: {}", id);
+        try {
+            DocumentDTO document = documentService.load(id);
+            logger.info("Successfully fetched document with ID: {}", id);
+            return new ResponseEntity<>(document, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching document with ID: {}", id, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public ResponseEntity<List<DocumentDTO>> getDocuments() {
-        List<DocumentDTO> documents = documentService.loadAll();
-        return new ResponseEntity<>(documents, HttpStatus.OK);
+        logger.info("Received request to fetch all documents");
+        try {
+            List<DocumentDTO> documents = documentService.loadAll();
+            logger.info("Successfully fetched {} documents", documents.size());
+            return new ResponseEntity<>(documents, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching all documents", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
-        Document documentEntity = new Document(document);
-        int messageCount = 1;
-
+        logger.info("Received request to upload a document");
         if (document == null || file == null || file.isEmpty()) {
+            logger.warn("Bad request: document or file is null/empty");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        Document documentEntity = new Document(document);
+        int messageCount = 1;
+
         try {
             // Save the document to the database
+            logger.debug("Storing document in the database: {}", document);
             documentService.store(documentEntity);
+            logger.info("Successfully stored document in the database");
 
             // Create a RabbitMQ message with headers
+            logger.debug("Sending document to RabbitMQ queue: {}", RabbitMQConfig.ECHO_IN_QUEUE_NAME);
             MessageProperties messageProperties = new MessageProperties();
             messageProperties.setHeader(RabbitMQConfig.ECHO_MESSAGE_COUNT_PROPERTY_NAME, messageCount);
             Message message = MessageBuilder
@@ -83,18 +112,26 @@ public class DocumentController implements ApiApi {
 
             // Send the message to the RabbitMQ queue
             rabbitTemplate.send(RabbitMQConfig.ECHO_IN_QUEUE_NAME, message);
+            logger.info("Successfully sent document to RabbitMQ queue: {}", RabbitMQConfig.ECHO_IN_QUEUE_NAME);
 
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error occurred while uploading document", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
     public ResponseEntity<Void> updateDocument(Integer id) {
-        DocumentDTO documentDTO = new DocumentDTO();
-        documentService.update(id, documentDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        logger.info("Received request to update document with ID: {}", id);
+        try {
+            DocumentDTO documentDTO = new DocumentDTO();
+            documentService.update(id, documentDTO);
+            logger.info("Successfully updated document with ID: {}", id);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error("Error occurred while updating document with ID: {}", id, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
