@@ -102,7 +102,7 @@ public class DocumentController implements ApiApi {
             logger.info("Successfully stored document in the database");
 
             // Create a RabbitMQ message with headers
-            logger.debug("Sending document to RabbitMQ queue: {}", RabbitMQConfig.ECHO_IN_QUEUE_NAME);
+            logger.debug("Sending document to RabbitMQ queue: {}", RabbitMQConfig.OCR_QUEUE);
             MessageProperties messageProperties = new MessageProperties();
             messageProperties.setHeader(RabbitMQConfig.ECHO_MESSAGE_COUNT_PROPERTY_NAME, messageCount);
             Message message = MessageBuilder
@@ -111,8 +111,8 @@ public class DocumentController implements ApiApi {
                     .build();
 
             // Send the message to the RabbitMQ queue
-            rabbitTemplate.send(RabbitMQConfig.ECHO_IN_QUEUE_NAME, message);
-            logger.info("Successfully sent document to RabbitMQ queue: {}", RabbitMQConfig.ECHO_IN_QUEUE_NAME);
+            rabbitTemplate.send(RabbitMQConfig.OCR_QUEUE, message);
+            logger.info("Successfully sent document to RabbitMQ queue: {}", RabbitMQConfig.OCR_QUEUE);
 
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {

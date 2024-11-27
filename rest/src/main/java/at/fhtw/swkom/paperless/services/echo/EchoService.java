@@ -18,7 +18,7 @@ public class EchoService {
         this.rabbit = rabbit;
     }
 
-    @RabbitListener(queues = RabbitMQConfig.ECHO_IN_QUEUE_NAME)
+    @RabbitListener(queues = RabbitMQConfig.OCR_QUEUE)
     public void processMessage(String message, @Header(RabbitMQConfig.ECHO_MESSAGE_COUNT_PROPERTY_NAME) int messageCount) {
         System.out.println("Received Message #" + messageCount + ": " + message);
 
@@ -30,6 +30,6 @@ public class EchoService {
         }
 
         // Forward the processed message to the Echo_Out queue
-        rabbit.convertAndSend(RabbitMQConfig.ECHO_OUT_QUEUE_NAME, "Echo " + message);
+        rabbit.convertAndSend(RabbitMQConfig.RESULT_QUEUE, "Echo " + message);
     }
 }
