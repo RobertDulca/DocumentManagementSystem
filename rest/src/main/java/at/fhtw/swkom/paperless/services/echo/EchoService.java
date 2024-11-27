@@ -22,16 +22,14 @@ public class EchoService {
     public void processMessage(String message, @Header(RabbitMQConfig.ECHO_MESSAGE_COUNT_PROPERTY_NAME) int messageCount) {
         System.out.println("Received Message #" + messageCount + ": " + message);
 
-        // Delay
+        // Simulate processing delay
         try {
             Thread.sleep(message.length() * 1000L);
         } catch (InterruptedException e) {
-            System.out.println("Delete2ndChar service interrupted");
+            System.out.println("Processing interrupted");
         }
 
+        // Forward the processed message to the Echo_Out queue
         rabbit.convertAndSend(RabbitMQConfig.ECHO_OUT_QUEUE_NAME, "Echo " + message);
-        // log.info("Sent Message: Echo {}", message);
     }
 }
-
-

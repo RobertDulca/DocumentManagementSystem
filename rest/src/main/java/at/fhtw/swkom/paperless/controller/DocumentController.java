@@ -1,10 +1,15 @@
 package at.fhtw.swkom.paperless.controller;
 
+import at.fhtw.swkom.paperless.config.RabbitMQConfig;
 import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.services.DocumentService;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import at.fhtw.swkom.paperless.services.echo.EchoService;
 import jakarta.annotation.Generated;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +28,13 @@ public class DocumentController implements ApiApi {
 
     private final NativeWebRequest request;
     private final DocumentService documentService;
-    private final EchoService echoService;
+    private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public DocumentController(NativeWebRequest request, DocumentService documentService, EchoService echoService) {
+    public DocumentController(NativeWebRequest request, DocumentService documentService, RabbitTemplate rabbitTemplate) {
         this.request = request;
         this.documentService = documentService;
-        this.echoService = echoService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
@@ -59,14 +64,29 @@ public class DocumentController implements ApiApi {
     public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
         Document documentEntity = new Document(document);
         int messageCount = 1;
-        if (document == null) {
+
+        if (document == null || file == null || file.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
         try {
+            // Save the document to the database
             documentService.store(documentEntity);
-            echoService.processMessage(document, messageCount);
+
+            // Create a RabbitMQ message with headers
+            MessageProperties messageProperties = new MessageProperties();
+            messageProperties.setHeader(RabbitMQConfig.ECHO_MESSAGE_COUNT_PROPERTY_NAME, messageCount);
+            Message message = MessageBuilder
+                    .withBody(document.getBytes())
+                    .andProperties(messageProperties)
+                    .build();
+
+            // Send the message to the RabbitMQ queue
+            rabbitTemplate.send(RabbitMQConfig.ECHO_IN_QUEUE_NAME, message);
+
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
