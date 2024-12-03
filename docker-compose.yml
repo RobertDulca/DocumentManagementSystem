@@ -19,6 +19,7 @@ services:
       - POSTGRES_DB=paperlessdb
     networks:
       - paperless
+
   rest:
     build: rest
     container_name: paperless-rest
@@ -38,9 +39,16 @@ services:
     networks:
       - paperless
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/paperlessdb
+      - DB_HOST=db
+      - SERVER_PORT=8081
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - SPRING_RABBITMQ_HOST=queue
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=test
+      - SPRING_RABBITMQ_PASSWORD=test
+
   ui:
     build: ui
     container_name: paperless-ui
@@ -50,6 +58,7 @@ services:
       - "80:80"
     networks:
       - paperless
+
   queue:
     image: rabbitmq:3-management
     restart: unless-stopped
