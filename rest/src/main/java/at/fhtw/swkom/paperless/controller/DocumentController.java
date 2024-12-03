@@ -3,6 +3,7 @@ package at.fhtw.swkom.paperless.controller;
 import at.fhtw.swkom.paperless.config.RabbitMQConfig;
 import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.services.DocumentService;
+import at.fhtw.swkom.paperless.services.FileStorageImpl;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import jakarta.annotation.Generated;
 import org.apache.logging.log4j.LogManager;
@@ -32,12 +33,14 @@ public class DocumentController implements ApiApi {
     private final NativeWebRequest request;
     private final DocumentService documentService;
     private final RabbitTemplate rabbitTemplate;
+    private final FileStorageImpl fileStorage;
 
     @Autowired
-    public DocumentController(NativeWebRequest request, DocumentService documentService, RabbitTemplate rabbitTemplate) {
+    public DocumentController(NativeWebRequest request, DocumentService documentService, RabbitTemplate rabbitTemplate, FileStorageImpl fileStorage) {
         this.request = request;
         this.documentService = documentService;
         this.rabbitTemplate = rabbitTemplate;
+        this.fileStorage = fileStorage;
     }
 
     @Override
@@ -99,6 +102,7 @@ public class DocumentController implements ApiApi {
             // Save the document to the database
             logger.debug("Storing document in the database: {}", document);
             documentService.store(documentEntity);
+            fileStorage.upload(document, file.getBytes());
             logger.info("Successfully stored document in the database");
 
             // Create a RabbitMQ message with headers
