@@ -11,13 +11,11 @@ public interface DocumentMapper {
 
     DocumentMapper INSTANCE = Mappers.getMapper(DocumentMapper.class);
 
-    // Map Document entity to DocumentDTO
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "createdAt", target = "createdAt")
     DocumentDTO entityToDto(Document document);
 
-    // Map DocumentDTO to Document entity
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "createdAt", target = "createdAt")
