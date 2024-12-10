@@ -71,6 +71,7 @@ services:
       RABBITMQ_DEFAULT_PASS: test
     networks:
       - paperless
+
   minio:
     container_name: paperless-minio
     image: minio/minio
