@@ -6,7 +6,6 @@ import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import java.util.List;
 
 public interface DocumentService {
-    void init();
 
     void store(Document documentEntity);
 

@@ -5,7 +5,9 @@ import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.services.DocumentService;
 import at.fhtw.swkom.paperless.services.FileStorageImpl;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
+import at.fhtw.swkom.paperless.services.exception.StorageFileNotFoundException;
 import jakarta.annotation.Generated;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.core.Message;
@@ -15,11 +17,14 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -138,4 +143,33 @@ public class DocumentController implements ApiApi {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @ExceptionHandler(StorageFileNotFoundException.class)
+    public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
+        return ResponseEntity.notFound().build();
+    }
+
+
+
+    private static String getFilePath(HttpServletRequest rq) {
+        String servletPath = rq.getServletPath();
+        if ( servletPath == null || servletPath.isEmpty() || servletPath.isBlank() )
+            return servletPath;
+        if ( servletPath.startsWith("/") )
+            return servletPath.substring(1);
+        return servletPath;
+    }
+
+    private String getSecureFullPath(String fileUploadDirectory, String filePath) {
+        filePath = filePath.replaceFirst("^(/|\\\\)", "");
+
+        Path path = Paths.get(fileUploadDirectory, filePath)/*.toAbsolutePath()*/.normalize();
+
+        if (!path.startsWith(Paths.get(fileUploadDirectory))) {
+            throw new IllegalArgumentException("Not a valid path");
+        } else {
+            return path.toString();
+        }
+    }
+
 }
