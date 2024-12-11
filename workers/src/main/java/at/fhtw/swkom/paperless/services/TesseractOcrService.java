@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -60,8 +61,7 @@ public class TesseractOcrService implements OcrService{
             String result = doOCR(tempFile);
             log.info(result);
 
-            // document.setContent( JsonNullable.of(result));
-            // document.setModified(OffsetDateTime.now());
+            document.setContent(result);
 
         } catch (TesseractException | IOException e) {
             log.error(e.getMessage());

@@ -17,7 +17,6 @@ public class Document {
     private String title;
     private String content;
     private String documentType;
-    private String OcrText;
     private LocalDateTime createdAt;
 
     @Builder
