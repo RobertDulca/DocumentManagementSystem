@@ -21,14 +21,13 @@ public class RabbitMQConfig {
     public static final String ECHO_MESSAGE_COUNT_PROPERTY_NAME = "MessageCount";
 
     @Bean
-    public Queue ocrInQueue() {
+    public Queue OcrQueue() {
         return new Queue(OCR_QUEUE_NAME, false);
     }
 
     @Bean
-    public Queue ocrOutQueue() {
-        return new Queue(RESULT_QUEUE_NAME, false);
-    }
+    public Queue ResultQueue() { return new Queue(RESULT_QUEUE_NAME, false); }
+
 
     @Bean
     public ConnectionFactory connectionFactory() {
