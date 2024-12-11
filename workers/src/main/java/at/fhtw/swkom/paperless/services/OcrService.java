@@ -7,5 +7,5 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 public interface OcrService {
     @RabbitListener(queues = RabbitMQConfig.OCR_QUEUE_NAME)
-    void processMessage(String message, String storagePath) throws StorageFileNotFoundException, JsonProcessingException;
+    public void processMessage(org.springframework.amqp.core.Message message) throws JsonProcessingException;
 }

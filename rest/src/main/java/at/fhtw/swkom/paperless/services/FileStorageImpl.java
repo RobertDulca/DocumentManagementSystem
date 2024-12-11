@@ -26,22 +26,23 @@ public class FileStorageImpl implements FileStorage {
     @Override
     public void upload(String objectName, byte[] file) {
         try {
+            // Ensure the bucket exists
             boolean hasBucketWithName =
                     minioClient.bucketExists(
-                            BucketExistsArgs
-                                    .builder()
+                            BucketExistsArgs.builder()
                                     .bucket(minIOConfig.getBucketName())
                                     .build()
                     );
+
             if (!hasBucketWithName) {
                 minioClient.makeBucket(
-                        MakeBucketArgs
-                                .builder()
+                        MakeBucketArgs.builder()
                                 .bucket(minIOConfig.getBucketName())
                                 .build()
                 );
             }
 
+            // Upload the file to the specified path (objectName includes the folder structure)
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(minIOConfig.getBucketName())
@@ -50,6 +51,8 @@ public class FileStorageImpl implements FileStorage {
                             .build()
             );
 
+            System.out.println("File uploaded successfully: " + objectName);
+
         } catch (MinioException e) {
             System.out.println("Error occurred: " + e);
             System.out.println("HTTP trace: " + e.httpTrace());
@@ -57,6 +60,7 @@ public class FileStorageImpl implements FileStorage {
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public byte[] download(String objectName) {

@@ -11,6 +11,7 @@ import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.openapitools.jackson.nullable.JsonNullableModule;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,37 +39,54 @@ public class TesseractOcrService implements OcrService{
 
     @Override
     @RabbitListener(queues = RabbitMQConfig.OCR_QUEUE_NAME)
-    public void processMessage(String message, String storagePath) throws JsonProcessingException {
-        log.info("Received Message: " + message);
+    public void processMessage(org.springframework.amqp.core.Message message) throws JsonProcessingException {
+        log.info("Received Message: {}", message);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new JsonNullableModule());
 
-        // fetch document data
-        Document document = mapper.readValue( message, Document.class);
-        log.debug("Received Document: " + document);
-        log.debug("Received Document storage path: " + storagePath);
+        try {
+            // Deserialize the body to Document
+            String body = new String(message.getBody());
+            Document document = mapper.readValue(body, Document.class);
 
-        // fetch document file
-        var doc = storageService.download(storagePath);
-        if ( doc==null || doc.length == 0)
-            throw new StorageFileNotFoundException(storagePath);
+            // Retrieve the storagePath from message headers
+            String storagePath = message.getMessageProperties().getHeader("storagePath");
+            if (storagePath == null || storagePath.isEmpty()) {
+                throw new IllegalArgumentException("Storage path is missing in message headers");
+            }
 
-        // do OCR recognition
-        try (InputStream inputStream = new ByteArrayInputStream(doc)) {
-            File tempFile = createTempFile(storagePath, inputStream);
-            String result = doOCR(tempFile);
-            log.info(result);
+            log.debug("Received Document: {}", document);
+            log.debug("Storage Path: {}", storagePath);
 
-            document.setContent(result);
+            // Fetch the file from MinIO
+            byte[] fileBytes = storageService.download(storagePath);
+            if (fileBytes == null || fileBytes.length == 0) {
+                throw new StorageFileNotFoundException(storagePath);
+            }
 
-        } catch (TesseractException | IOException e) {
-            log.error(e.getMessage());
+            // Perform OCR on the file
+            try (InputStream inputStream = new ByteArrayInputStream(fileBytes)) {
+                File tempFile = createTempFile(storagePath, inputStream);
+                String result = doOCR(tempFile);
+                log.info("OCR Result: {}", result);
+
+                // Update document content
+                document.setContent(result);
+
+                // Send updated document back to RabbitMQ
+                String updatedMessage = mapper.writeValueAsString(document);
+                rabbit.convertAndSend(RabbitMQConfig.OCR_QUEUE_NAME, updatedMessage);
+                log.info("Updated document sent to RabbitMQ");
+
+            } catch (TesseractException | IOException e) {
+                log.error("Error during OCR process", e);
+            }
+
+        } catch (Exception e) {
+            log.error("Error processing message", e);
         }
-
-        String documentString = mapper.writeValueAsString(document);
-        rabbit.convertAndSend( RabbitMQConfig.OCR_QUEUE_NAME, documentString);
     }
 
     public String doOCR(File tempFile) throws TesseractException {

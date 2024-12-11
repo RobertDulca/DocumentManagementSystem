@@ -18,7 +18,6 @@ public class RabbitMQConfig {
     public static final String RESULT_QUEUE_NAME = "RESULT_QUEUE";
     public static final String DOCUMENT_STORAGE_PATH_PROPERTY_NAME = "FileStoragePath";
     public static final String ECHO_MESSAGE_COUNT_PROPERTY_NAME = "MessageCount";
-    public static final String OCR_IN_QUEUE_NAME = "OCR_IN";
 
     @Bean
     public ConnectionFactory connectionFactory() {

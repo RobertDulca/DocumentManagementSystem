@@ -6,6 +6,8 @@ import at.fhtw.swkom.paperless.services.DocumentService;
 import at.fhtw.swkom.paperless.services.FileStorageImpl;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import at.fhtw.swkom.paperless.services.exception.StorageFileNotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.Generated;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,42 +96,57 @@ public class DocumentController implements ApiApi {
     }
 
     @Override
-    public ResponseEntity<Void> postDocument(String document, MultipartFile file) {
+    public ResponseEntity<Void> postDocument(String documentTitle, MultipartFile file) {
         logger.info("Received request to upload a document");
-        if (document == null || file == null || file.isEmpty()) {
-            logger.warn("Bad request: document or file is null/empty");
+
+        if (documentTitle == null || file == null || file.isEmpty()) {
+            logger.warn("Bad request: document title or file is null/empty");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Document documentEntity = new Document(document);
-        int messageCount = 1;
+        Document documentEntity = Document.builder()
+                .title(documentTitle)
+                .createdAt(LocalDateTime.now())
+                .build();
 
         try {
             // Save the document to the database
-            logger.debug("Storing document in the database: {}", document);
-            documentService.store(documentEntity);
-            fileStorage.upload(document, file.getBytes());
-            logger.info("Successfully stored document in the database");
+            logger.debug("Storing document in the database: {}", documentTitle);
+            documentEntity = documentService.store(documentEntity);
 
-            // Create a RabbitMQ message with headers
-            logger.debug("Sending document to RabbitMQ queue: {}", RabbitMQConfig.OCR_QUEUE_NAME);
-            MessageProperties messageProperties = new MessageProperties();
-            messageProperties.setHeader(RabbitMQConfig.ECHO_MESSAGE_COUNT_PROPERTY_NAME, messageCount);
-            Message message = MessageBuilder
-                    .withBody(document.getBytes())
-                    .andProperties(messageProperties)
+            // Prepare file path for MinIO
+            String folderPath = "documents/" + documentEntity.getId() + "/";
+            String objectName = folderPath + file.getOriginalFilename();
+
+            // Upload the file to MinIO
+            logger.debug("Uploading file to MinIO: {}", objectName);
+            fileStorage.upload(objectName, file.getBytes());
+            logger.info("File successfully uploaded to MinIO at: {}", objectName);
+
+            // Prepare RabbitMQ message
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            String message = mapper.writeValueAsString(documentEntity);
+
+            // Send the file path and metadata to RabbitMQ
+            MessageProperties props = new MessageProperties();
+            props.setHeader("storagePath", objectName);
+            Message rabbitMessage = MessageBuilder
+                    .withBody(message.getBytes())
+                    .andProperties(props)
                     .build();
 
-            // Send the message to the RabbitMQ queue
-            rabbitTemplate.send(RabbitMQConfig.OCR_QUEUE_NAME, message);
-            logger.info("Successfully sent document to RabbitMQ queue: {}", RabbitMQConfig.OCR_QUEUE_NAME);
+            rabbitTemplate.send(RabbitMQConfig.OCR_QUEUE_NAME, rabbitMessage);
+            logger.info("Message sent to RabbitMQ queue: {}", RabbitMQConfig.OCR_QUEUE_NAME);
 
             return new ResponseEntity<>(HttpStatus.CREATED);
+
         } catch (Exception e) {
             logger.error("Error occurred while uploading document", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @Override
     public ResponseEntity<Void> updateDocument(Integer id) {

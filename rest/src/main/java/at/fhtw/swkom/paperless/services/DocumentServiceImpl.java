@@ -25,17 +25,13 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void init() {
-
-    }
-
-    @Override
-    public void store(Document documentEntity) {
-        if (documentEntity == null){
+    public Document store(Document documentEntity) {
+        if (documentEntity == null) {
             throw new StorageException("No documentEntity found!");
         }
-        documentRepository.save(documentEntity);
+        return documentRepository.save(documentEntity); // Return the persisted document
     }
+
 
     @Override
     public List<DocumentDTO> loadAll() {

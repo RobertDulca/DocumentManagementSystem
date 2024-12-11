@@ -87,6 +87,28 @@ services:
     networks:
       - paperless
 
+  workers:
+    build: workers
+    restart: unless-stopped
+    depends_on:
+      minio:
+        condition: service_started
+      queue:
+        condition: service_started
+    environment:
+      - MINIO_URL= http://minio:9000/
+      - SPRING_RABBITMQ_HOST= queue
+      - SPRING_RABBITMQ_PORT= 5672
+      - SPRING_RABBITMQ_USERNAME= test
+      - SPRING_RABBITMQ_PASSWORD= test
+      - DATASOURCE_URL= jdbc:postgresql://db:5432/paperlessdb
+      - TESSERACT_DATA= /usr/share/tesseract-ocr/4.00/tessdata
+      - FILESTORAGE_PATH= /storage
+    ports:
+      - "8082:8082"
+    networks:
+      - paperless
+
 volumes:
   minio-storage: { }
 

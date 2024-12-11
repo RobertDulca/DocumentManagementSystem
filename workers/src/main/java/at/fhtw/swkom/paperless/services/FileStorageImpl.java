@@ -66,10 +66,8 @@ public class FileStorageImpl implements FileStorage {
                             .bucket(minIOConfig.getBucketName())
                             .object(objectName)
                             .build()));
-        } catch (ServerException | InvalidResponseException | InsufficientDataException | IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | ErrorResponseException | XmlParserException |
-                 InternalException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to download file from MinIO: " + objectName, e);
         }
     }
 }

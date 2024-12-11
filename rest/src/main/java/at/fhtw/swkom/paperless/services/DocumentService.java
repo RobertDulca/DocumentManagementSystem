@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface DocumentService {
 
-    void store(Document documentEntity);
+    Document store(Document documentEntity);
 
     List<DocumentDTO> loadAll();
 

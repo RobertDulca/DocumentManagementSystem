@@ -1,6 +1,7 @@
 package at.fhtw.swkom.paperless.config;
 
 import at.fhtw.swkom.paperless.services.ServicesErrorHandler;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -18,7 +19,16 @@ public class RabbitMQConfig {
     public static final String RESULT_QUEUE_NAME = "RESULT_QUEUE";
     public static final String DOCUMENT_STORAGE_PATH_PROPERTY_NAME = "FileStoragePath";
     public static final String ECHO_MESSAGE_COUNT_PROPERTY_NAME = "MessageCount";
-    public static final String OCR_IN_QUEUE_NAME = "OCR_IN";
+
+    @Bean
+    public Queue ocrInQueue() {
+        return new Queue(OCR_QUEUE_NAME, false);
+    }
+
+    @Bean
+    public Queue ocrOutQueue() {
+        return new Queue(RESULT_QUEUE_NAME, false);
+    }
 
     @Bean
     public ConnectionFactory connectionFactory() {
