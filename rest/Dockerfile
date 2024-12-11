@@ -9,5 +9,10 @@ RUN mvn package -e
 
 # Create the actual container to run the built project
 FROM openjdk:21-jdk-slim
+
+# Install curl
+RUN apt-get update && apt-get install -y curl && apt-get clean
+
+#Copy build to image
 COPY --from=build /usr/app/target/openapi-spring-1.0.0.jar /app/runner.jar
 ENTRYPOINT ["java", "-jar", "/app/runner.jar"]
