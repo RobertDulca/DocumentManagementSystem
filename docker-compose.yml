@@ -12,7 +12,7 @@ services:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 30
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -31,7 +31,7 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 10
       start_period: 20s
     depends_on:
       db:
@@ -72,7 +72,7 @@ services:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 10s
       timeout: 10s
-      retries: 5
+      retries: 20
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -101,10 +101,8 @@ services:
     build: workers
     restart: unless-stopped
     depends_on:
-      minio:
-        condition: service_started
-      queue:
-        condition: service_started
+      rest:
+        condition: service_healthy
     environment:
       - MINIO_URL= http://minio:9000/
       - SPRING_RABBITMQ_HOST= queue
@@ -112,7 +110,7 @@ services:
       - SPRING_RABBITMQ_USERNAME= test
       - SPRING_RABBITMQ_PASSWORD= test
       - DATASOURCE_URL= jdbc:postgresql://db:5432/paperlessdb
-      - TESSERACT_DATA= /usr/share/tesseract-ocr/4.00/tessdata
+      - TESSERACT_DATA= /usr/share/tesseract-ocr/4.00/tessdata/
       - FILESTORAGE_PATH= /storage
     ports:
       - "8082:8082"

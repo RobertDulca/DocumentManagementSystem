@@ -90,8 +90,9 @@ public class TesseractOcrService implements OcrService{
     }
 
     public String doOCR(File tempFile) throws TesseractException {
+        System.setProperty("jna.library.path", "/usr/lib");
         var tesseract = new Tesseract();
-        tesseract.setDatapath(tesseractData);
+        tesseract.setDatapath(tesseractData); // Injected path from application.properties
         tesseract.setLanguage("eng");
         return tesseract.doOCR(tempFile);
     }

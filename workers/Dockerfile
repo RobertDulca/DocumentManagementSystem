@@ -1,24 +1,41 @@
 # BUILDER Stage
-FROM amazoncorretto:17-al2023-jdk as builder
+FROM maven:3.9.9-amazoncorretto-17-alpine AS builder
 WORKDIR /app
-COPY . .
-# install maven and build the .jar file (on amazone linux image)
-RUN yum install -y maven
-RUN mvn package
+
+# Copy project files
+COPY pom.xml ./
+RUN mvn verify --fail-never
+COPY . ./
+RUN mvn package -e
 
 # RUNNER Stage
-# OpenJDK 17 Image based on Debian
-FROM openjdk:17-bullseye as runner
-# Update the package list and install tesseract-ocr
+FROM openjdk:17-jdk-slim AS runner
+
+# Install Tesseract OCR and wget
 RUN apt-get update && \
-    apt-get install -y tesseract-ocr && \
+    apt-get install -y tesseract-ocr wget && \
     rm -rf /var/lib/apt/lists/*
-# Download the English language package for Tesseract
-RUN mkdir -p /usr/share/tesseract-ocr/4.00/tessdata
-ADD https://github.com/tesseract-ocr/tessdata_best/raw/main/eng.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
-# Verify Tesseract installation
+
+# Create tessdata directory and download the English language data
+RUN mkdir -p /usr/share/tesseract-ocr/4.00/tessdata && \
+    wget -O /usr/share/tesseract-ocr/4.00/tessdata/eng.traineddata \
+    https://github.com/tesseract-ocr/tessdata_best/raw/main/eng.traineddata
+
+# Set the TESSDATA_PREFIX environment variable
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/
+
+# Verify Tesseract installation and available languages
 RUN tesseract --version && \
     tesseract --list-langs
+
+# Set the working directory
+WORKDIR /app
+
+# Expose the port
 EXPOSE 8082
-COPY --from=builder ./app/target/*.jar ocrService.jar
-ENTRYPOINT ["java","-jar","ocrService.jar"]
+
+# Copy the built JAR file from the builder stage
+COPY --from=builder /app/target/*.jar ocrService.jar
+
+# Start the worker service
+ENTRYPOINT ["java", "-jar", "ocrService.jar"]
