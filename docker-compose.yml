@@ -72,7 +72,7 @@ services:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 10s
       timeout: 10s
-      retries: 20
+      retries: 30
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -110,7 +110,7 @@ services:
       - SPRING_RABBITMQ_USERNAME= test
       - SPRING_RABBITMQ_PASSWORD= test
       - DATASOURCE_URL= jdbc:postgresql://db:5432/paperlessdb
-      - TESSERACT_DATA= /usr/share/tesseract-ocr/4.00/tessdata/
+      - TESSERACT_DATA= /app/tessdata/
       - FILESTORAGE_PATH= /storage
     ports:
       - "8082:8082"

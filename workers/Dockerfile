@@ -1,41 +1,41 @@
-# BUILDER Stage
-FROM maven:3.9.9-amazoncorretto-17-alpine AS builder
-WORKDIR /app
+# BUILDER Stage - Build the project with Maven
+FROM maven:3.9.9-amazoncorretto-21-alpine AS build
+ENV HOME=/usr/app
+WORKDIR $HOME
 
-# Copy project files
-COPY pom.xml ./
+# Copy project files and build
+COPY pom.xml $HOME
 RUN mvn verify --fail-never
-COPY . ./
+COPY . $HOME
 RUN mvn package -e
 
-# RUNNER Stage
-FROM openjdk:17-jdk-slim AS runner
+# RUNNER Stage - Create a lightweight container to run the built application
+FROM openjdk:21-jdk-slim AS runner
 
-# Install Tesseract OCR and wget
-RUN apt-get update && \
-    apt-get install -y tesseract-ocr wget && \
+# Download English language data for Tesseract
+RUN mkdir -p /app/tessdata
+
+# Install Tesseract OCR and dependencies
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr wget curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Create tessdata directory and download the English language data
-RUN mkdir -p /usr/share/tesseract-ocr/4.00/tessdata && \
-    wget -O /usr/share/tesseract-ocr/4.00/tessdata/eng.traineddata \
-    https://github.com/tesseract-ocr/tessdata_best/raw/main/eng.traineddata
+RUN wget -O /app/tessdata/eng.traineddata https://github.com/tesseract-ocr/tessdata/raw/refs/heads/main/eng.traineddata
 
-# Set the TESSDATA_PREFIX environment variable
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/
+# Set the TESSDATA_PREFIX environment variable for Tesseract
+ENV TESSDATA_PREFIX=/app/tessdata/
 
-# Verify Tesseract installation and available languages
-RUN tesseract --version && \
-    tesseract --list-langs
+# Verify Tesseract installation
+RUN tesseract --version && tesseract --list-langs
 
 # Set the working directory
 WORKDIR /app
 
-# Expose the port
-EXPOSE 8082
-
 # Copy the built JAR file from the builder stage
-COPY --from=builder /app/target/*.jar ocrService.jar
+COPY --from=build /usr/app/target/*.jar ocrService.jar
+
+# Expose the application port
+EXPOSE 8082
 
 # Start the worker service
 ENTRYPOINT ["java", "-jar", "ocrService.jar"]
