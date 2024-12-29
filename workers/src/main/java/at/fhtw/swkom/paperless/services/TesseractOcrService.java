@@ -39,26 +39,20 @@ public class TesseractOcrService implements OcrService{
 
     @Override
     @RabbitListener(queues = RabbitMQConfig.OCR_QUEUE_NAME)
-    public void processMessage(org.springframework.amqp.core.Message message) throws JsonProcessingException {
+    public void processMessage(org.springframework.amqp.core.Message message) {
         log.info("Received Message: {}", message);
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.registerModule(new JsonNullableModule());
-
         try {
-            // Deserialize the body to Document
-            String body = new String(message.getBody());
-            Document document = mapper.readValue(body, Document.class);
-
             // Retrieve the storagePath from message headers
             String storagePath = message.getMessageProperties().getHeader("storagePath");
-            if (storagePath == null || storagePath.isEmpty()) {
-                throw new IllegalArgumentException("Storage path is missing in message headers");
+            Integer documentId = message.getMessageProperties().getHeader("documentId");
+
+            if (storagePath == null || storagePath.isEmpty() || documentId == null) {
+                throw new IllegalArgumentException("Storage path or Document ID is missing in message headers");
             }
 
-            log.debug("Received Document: {}", document);
             log.debug("Storage Path: {}", storagePath);
+            log.debug("Document ID: {}", documentId);
 
             // Fetch the file from MinIO
             byte[] fileBytes = storageService.download(storagePath);
@@ -72,13 +66,19 @@ public class TesseractOcrService implements OcrService{
                 String result = doOCR(tempFile);
                 log.info("OCR Result: {}", result);
 
-                // Update document content
-                document.setContent(result);
+                // Prepare headers for the new message
+                MessageProperties newMessageProperties = new MessageProperties();
+                newMessageProperties.setHeader("documentId", documentId);
 
-                // Send updated document back to RabbitMQ
-                String updatedMessage = mapper.writeValueAsString(document);
-                rabbit.convertAndSend(RabbitMQConfig.OCR_QUEUE_NAME, updatedMessage);
-                log.info("Updated document sent to RabbitMQ");
+                // Create a new message with the OCR result and headers
+                org.springframework.amqp.core.Message newMessage = new org.springframework.amqp.core.Message(
+                        result.getBytes(),
+                        newMessageProperties
+                );
+
+                // Send updated message back to RabbitMQ
+                rabbit.send(RabbitMQConfig.RESULT_QUEUE_NAME, newMessage);
+                log.info("Message sent to RabbitMQ queue: {}", RabbitMQConfig.RESULT_QUEUE_NAME);
 
             } catch (TesseractException | IOException e) {
                 log.error("Error during OCR process", e);
@@ -88,6 +88,7 @@ public class TesseractOcrService implements OcrService{
             log.error("Error processing message", e);
         }
     }
+
 
     public String doOCR(File tempFile) throws TesseractException {
         var tesseract = new Tesseract();

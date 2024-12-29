@@ -110,7 +110,7 @@ public class DocumentController implements ApiApi {
                 .build();
 
         try {
-            // Save the document to the database
+            // Save the document metadata to the database
             logger.debug("Storing document in the database: {}", documentTitle);
             documentEntity = documentService.store(documentEntity);
 
@@ -123,21 +123,14 @@ public class DocumentController implements ApiApi {
             fileStorage.upload(objectName, file.getBytes());
             logger.info("File successfully uploaded to MinIO at: {}", objectName);
 
-            // Prepare RabbitMQ message
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            String message = mapper.writeValueAsString(documentEntity);
-
-            // Send the file path and metadata to RabbitMQ
+            // Send only headers to RabbitMQ
             MessageProperties props = new MessageProperties();
             props.setHeader("storagePath", objectName);
-            Message rabbitMessage = MessageBuilder
-                    .withBody(message.getBytes())
-                    .andProperties(props)
-                    .build();
+            props.setHeader("documentId", documentEntity.getId());
+            Message rabbitMessage = new Message(new byte[0], props);
 
             rabbitTemplate.send(RabbitMQConfig.OCR_QUEUE_NAME, rabbitMessage);
-            logger.info("Message sent to RabbitMQ queue: {}", RabbitMQConfig.OCR_QUEUE_NAME);
+            logger.info("Headers sent to RabbitMQ queue: {}", RabbitMQConfig.OCR_QUEUE_NAME);
 
             return new ResponseEntity<>(HttpStatus.CREATED);
 
@@ -146,6 +139,7 @@ public class DocumentController implements ApiApi {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
     @Override

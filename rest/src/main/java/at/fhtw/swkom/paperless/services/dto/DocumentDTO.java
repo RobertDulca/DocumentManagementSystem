@@ -23,6 +23,7 @@ public class DocumentDTO {
     private String title;
 
     private LocalDateTime createdAt;
+    private String content;
 
     public DocumentDTO() {
         super();
@@ -73,6 +74,25 @@ public class DocumentDTO {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public DocumentDTO content(String content) {
+        this.content = content;
+        return this;
+    }
+
+    /**
+     * The content of the document
+     * @return content
+     */
+    @Schema(name = "content", description = "The content of the document", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonProperty("content")
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public DocumentDTO created(LocalDateTime created) {

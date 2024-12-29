@@ -12,7 +12,7 @@ services:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
-      retries: 30
+      retries: 60
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -73,9 +73,12 @@ services:
       interval: 10s
       timeout: 10s
       retries: 30
+      start_period: 23s
     ports:
       - "5672:5672"
       - "15672:15672"
+    volumes:
+      - rabbitmq-storage:/var/lib/rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: test
       RABBITMQ_DEFAULT_PASS: test
@@ -110,7 +113,7 @@ services:
       - SPRING_RABBITMQ_USERNAME= test
       - SPRING_RABBITMQ_PASSWORD= test
       - DATASOURCE_URL= jdbc:postgresql://db:5432/paperlessdb
-      - TESSERACT_DATA= /app/tessdata/
+      - TESSERACT_DATA=/app/tessdata
       - FILESTORAGE_PATH= /storage
     ports:
       - "8082:8082"
@@ -119,6 +122,7 @@ services:
 
 volumes:
   minio-storage: { }
+  rabbitmq-storage: {}
 
 networks:
   paperless:

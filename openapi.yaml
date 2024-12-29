@@ -105,6 +105,9 @@ components:
           description: "The author of the document's contents"
         created:
           type: string
+        content:
+          type: string
+          description: "The content of the document"
       required:
         - title
     documents:

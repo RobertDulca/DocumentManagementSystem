@@ -54,7 +54,7 @@
         <td>{document.title}</td>
         <td>{new Date(document.created).toLocaleDateString()}</td>
         <td>
-          <button class="btn btn-primary btn-sm">View</button>
+          <a href={`/documents/${document.id}`} class="btn btn-primary btn-sm">View</a>
           <button
                   class="btn btn-danger btn-sm"
                   on:click={() => deleteDocument(document.id)}
