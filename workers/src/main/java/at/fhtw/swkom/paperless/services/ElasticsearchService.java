@@ -3,24 +3,24 @@ package at.fhtw.swkom.paperless.services;
 import at.fhtw.swkom.paperless.config.ElasticSearchConfig;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Result;
 import co.elastic.clients.elasticsearch.core.DeleteResponse;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import co.elastic.clients.elasticsearch._types.Result;
 
 import java.io.IOException;
 import java.util.Optional;
 
 @Component
 @Slf4j
-public class ElasticSearchServiceImpl implements SearchIndexService {
+public class ElasticsearchService implements SearchIndexService {
     private final ElasticsearchClient esClient;
 
     @Autowired
-    public ElasticSearchServiceImpl(ElasticsearchClient esClient) throws IOException {
+    public ElasticsearchService(ElasticsearchClient esClient) throws IOException {
         this.esClient = esClient;
 
         if (!esClient.indices().exists(
