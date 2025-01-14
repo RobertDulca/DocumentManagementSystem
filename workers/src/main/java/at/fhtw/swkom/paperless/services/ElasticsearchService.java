@@ -1,6 +1,6 @@
 package at.fhtw.swkom.paperless.services;
 
-import at.fhtw.swkom.paperless.config.ElasticSearchConfig;
+import at.fhtw.swkom.paperless.config.ElasticsearchConfig;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Result;
@@ -24,10 +24,10 @@ public class ElasticsearchService implements SearchIndexService {
         this.esClient = esClient;
 
         if (!esClient.indices().exists(
-                i -> i.index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME)
+                i -> i.index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
         ).value()) {
             esClient.indices().create(c -> c
-                    .index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME)
+                    .index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
             );
         }
     }
@@ -36,7 +36,7 @@ public class ElasticsearchService implements SearchIndexService {
     public Result indexDocument(DocumentDTO document) throws IOException {
         // do indexing with ElasticSearch
         IndexResponse response = esClient.index(i -> i
-                .index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME)
+                .index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
                 .id(document.getId().toString())
                 .document(document)
         );
@@ -52,7 +52,7 @@ public class ElasticsearchService implements SearchIndexService {
     public Optional<DocumentDTO> getDocumentById(int id) {
         try {
             GetResponse<DocumentDTO> response = esClient.get(g -> g
-                            .index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME)
+                            .index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
                             .id(String.valueOf(id)),
                     DocumentDTO.class
             );
@@ -67,7 +67,7 @@ public class ElasticsearchService implements SearchIndexService {
     public boolean deleteDocumentById(int id) {
         DeleteResponse result = null;
         try {
-            result = esClient.delete(d -> d.index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME).id(String.valueOf(id)));
+            result = esClient.delete(d -> d.index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME).id(String.valueOf(id)));
         } catch (IOException e) {
             log.warn("Failed to delete document id=" + id + " from elasticsearch: " + e);
         }

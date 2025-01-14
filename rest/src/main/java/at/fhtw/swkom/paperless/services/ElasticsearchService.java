@@ -1,18 +1,23 @@
 package at.fhtw.swkom.paperless.services;
 
-import at.fhtw.swkom.paperless.config.ElasticSearchConfig;
+import at.fhtw.swkom.paperless.config.ElasticsearchConfig;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.DeleteResponse;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import co.elastic.clients.elasticsearch._types.Result;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -24,10 +29,10 @@ public class ElasticsearchService implements SearchIndexService {
         this.esClient = esClient;
 
         if (!esClient.indices().exists(
-                i -> i.index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME)
+                i -> i.index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
         ).value()) {
             esClient.indices().create(c -> c
-                    .index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME)
+                    .index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
             );
         }
     }
@@ -36,7 +41,7 @@ public class ElasticsearchService implements SearchIndexService {
     public Result indexDocument(DocumentDTO document) throws IOException {
         // do indexing with ElasticSearch
         IndexResponse response = esClient.index(i -> i
-                .index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME)
+                .index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
                 .id(document.getId().toString())
                 .document(document)
         );
@@ -52,7 +57,7 @@ public class ElasticsearchService implements SearchIndexService {
     public Optional<DocumentDTO> getDocumentById(int id) {
         try {
             GetResponse<DocumentDTO> response = esClient.get(g -> g
-                            .index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME)
+                            .index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
                             .id(String.valueOf(id)),
                     DocumentDTO.class
             );
@@ -67,7 +72,7 @@ public class ElasticsearchService implements SearchIndexService {
     public boolean deleteDocumentById(int id) {
         DeleteResponse result = null;
         try {
-            result = esClient.delete(d -> d.index(ElasticSearchConfig.DOCUMENTS_INDEX_NAME).id(String.valueOf(id)));
+            result = esClient.delete(d -> d.index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME).id(String.valueOf(id)));
         } catch (IOException e) {
             log.warn("Failed to delete document id=" + id + " from elasticsearch: " + e);
         }
@@ -78,4 +83,27 @@ public class ElasticsearchService implements SearchIndexService {
         return result.result()==Result.Deleted;
     }
 
+    @Override
+    public List<DocumentDTO> searchDocuments(String searchTerm) {
+        try {
+            SearchResponse<DocumentDTO> response = esClient.search(s -> s
+                            .index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
+                            .query(q -> q
+                                    .match(m -> m
+                                            .field("content") // Feld, das durchsucht werden soll
+                                            .query(searchTerm)
+                                    )
+                            ),
+                    DocumentDTO.class
+            );
+
+            return response.hits().hits().stream()
+                    .map(hit -> hit.source())
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            log.error("Failed to search documents with term='" + searchTerm + "': " + e);
+            return Collections.emptyList();
+        }
+    }
 }
