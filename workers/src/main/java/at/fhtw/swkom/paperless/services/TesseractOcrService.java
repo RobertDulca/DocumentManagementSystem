@@ -1,16 +1,17 @@
 package at.fhtw.swkom.paperless.services;
 
+import at.fhtw.swkom.paperless.config.ElasticsearchConfig;
 import at.fhtw.swkom.paperless.config.RabbitMQConfig;
 import at.fhtw.swkom.paperless.entities.Document;
 import at.fhtw.swkom.paperless.exception.StorageFileNotFoundException;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Result;
+import co.elastic.clients.elasticsearch.core.IndexResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
-import org.openapitools.jackson.nullable.JsonNullable;
-import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -20,20 +21,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.util.UUID;
 
 @Component
 @Slf4j
-public class TesseractOcrService implements OcrService{
+public class TesseractOcrService implements OcrService {
     private final RabbitTemplate rabbit;
-
     private final FileStorage storageService;
-
+    private final ElasticsearchClient esClient;
     private final String tesseractData;
 
     @Autowired
-    public TesseractOcrService(RabbitTemplate rabbit, FileStorage storageService, @Value("${tesseract.data}") String tessData) {
+    public TesseractOcrService(RabbitTemplate rabbit, FileStorage storageService, ElasticsearchClient esClient, @Value("${tesseract.data}") String tessData) {
         this.rabbit = rabbit;
         this.storageService = storageService;
+        this.esClient = esClient;
         this.tesseractData = tessData;
     }
 
@@ -43,7 +45,6 @@ public class TesseractOcrService implements OcrService{
         log.info("Received Message: {}", message);
 
         try {
-            // Retrieve the storagePath from message headers
             String storagePath = message.getMessageProperties().getHeader("storagePath");
             Integer documentId = message.getMessageProperties().getHeader("documentId");
 
@@ -54,17 +55,18 @@ public class TesseractOcrService implements OcrService{
             log.debug("Storage Path: {}", storagePath);
             log.debug("Document ID: {}", documentId);
 
-            // Fetch the file from MinIO
             byte[] fileBytes = storageService.download(storagePath);
             if (fileBytes == null || fileBytes.length == 0) {
                 throw new StorageFileNotFoundException(storagePath);
             }
 
-            // Perform OCR on the file
             try (InputStream inputStream = new ByteArrayInputStream(fileBytes)) {
                 File tempFile = createTempFile(storagePath, inputStream);
-                String result = doOCR(tempFile);
-                log.info("OCR Result: {}", result);
+                String ocrResult = doOCR(tempFile);
+                log.info("OCR Result: {}", ocrResult);
+
+                // Index the OCR result in Elasticsearch
+                indexDocumentInElasticsearch(documentId, ocrResult);
 
                 // Prepare headers for the new message
                 MessageProperties newMessageProperties = new MessageProperties();
@@ -72,11 +74,10 @@ public class TesseractOcrService implements OcrService{
 
                 // Create a new message with the OCR result and headers
                 org.springframework.amqp.core.Message newMessage = new org.springframework.amqp.core.Message(
-                        result.getBytes(),
+                        ocrResult.getBytes(),
                         newMessageProperties
                 );
 
-                // Send updated message back to RabbitMQ
                 rabbit.send(RabbitMQConfig.RESULT_QUEUE_NAME, newMessage);
                 log.info("Message sent to RabbitMQ queue: {}", RabbitMQConfig.RESULT_QUEUE_NAME);
 
@@ -89,10 +90,27 @@ public class TesseractOcrService implements OcrService{
         }
     }
 
+    private void indexDocumentInElasticsearch(Integer documentId, String content) {
+        try {
+            DocumentDTO documentDTO = new DocumentDTO();
+            documentDTO.setId(documentId);
+            documentDTO.setContent(content);
+
+            IndexResponse response = esClient.index(i -> i
+                    .index(ElasticsearchConfig.DOCUMENTS_INDEX_NAME)
+                    .id(documentId.toString())
+                    .document(documentDTO)
+            );
+
+            log.info("Indexed document {}: result={}, index={}", documentId, response.result(), response.index());
+        } catch (IOException e) {
+            log.error("Failed to index document in Elasticsearch", e);
+        }
+    }
 
     public String doOCR(File tempFile) throws TesseractException {
         var tesseract = new Tesseract();
-        tesseract.setDatapath(tesseractData); // Injected path from application.properties
+        tesseract.setDatapath(tesseractData);
         tesseract.setLanguage("eng");
         return tesseract.doOCR(tempFile);
     }
