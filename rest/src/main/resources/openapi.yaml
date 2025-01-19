@@ -6,7 +6,7 @@ info:
   title: Paperless REST-Server
   version: 1.0.0
 servers:
-- url: localhost:8081
+  - url: localhost:8081
 paths:
   /api/documents/post_document:
     post:
@@ -24,7 +24,7 @@ paths:
       summary: Upload a document
       x-content-type: multipart/form-data
       x-accepts:
-      - application/json
+        - application/json
   /api/documents:
     get:
       operationId: getDocuments
@@ -37,19 +37,41 @@ paths:
           description: Success
       summary: Return a list of documents
       x-accepts:
-      - application/json
+        - application/json
+  /api/documents/{search}:
+    get:
+      operationId: getDocumentsSearch
+      parameters:
+        - description: The search term of the document
+          explode: false
+          in: path
+          name: search
+          required: true
+          schema:
+            type: string
+          style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/documents'
+          description: Success
+      summary: Return a list of documents
+      x-accepts:
+        - application/json
   /api/documents/{id}:
     delete:
       operationId: deleteDocument
       parameters:
-      - description: The id of the document
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-        style: simple
+        - description: The id of the document
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          style: simple
       responses:
         "204":
           description: Document deleted successfully
@@ -57,18 +79,18 @@ paths:
           description: Document does not exist with this id!
       summary: Delete a document by id
       x-accepts:
-      - application/json
+        - application/json
     get:
       operationId: getDocument
       parameters:
-      - description: The id of the document
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-        style: simple
+        - description: The id of the document
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          style: simple
       responses:
         "200":
           content:
@@ -80,18 +102,18 @@ paths:
           description: Document does not exist with this id!
       summary: Retrieve a document by id
       x-accepts:
-      - application/json
+        - application/json
     put:
       operationId: updateDocument
       parameters:
-      - description: The id of the Document
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-        style: simple
+        - description: The id of the Document
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          style: simple
       responses:
         "200":
           description: Document updated successfully
@@ -99,7 +121,7 @@ paths:
           description: Document does not exist with this id!
       summary: Update a document by id
       x-accepts:
-      - application/json
+        - application/json
 components:
   schemas:
     document:
@@ -121,7 +143,7 @@ components:
         created:
           type: string
       required:
-      - title
+        - title
     documents:
       items:
         $ref: '#/components/schemas/document'

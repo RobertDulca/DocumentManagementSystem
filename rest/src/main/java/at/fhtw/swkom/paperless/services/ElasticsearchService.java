@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch.core.DeleteResponse;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -98,7 +99,7 @@ public class ElasticsearchService implements SearchIndexService {
             );
 
             return response.hits().hits().stream()
-                    .map(hit -> hit.source())
+                    .map(Hit::source)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         } catch (IOException e) {

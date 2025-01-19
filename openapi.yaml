@@ -1,116 +1,157 @@
 openapi: 3.1.0
 info:
-  title: Paperless REST-Server
   contact:
     name: Bernhard Wallisch
     url: https://www.technikum-wien.at/personal/bernhard-wallisch/
+  title: Paperless REST-Server
   version: 1.0.0
 servers:
-  - url: 'localhost:8081'
+  - url: localhost:8081
 paths:
   /api/documents/post_document:
     post:
-      summary: "Upload a document"
       operationId: postDocument
       requestBody:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                document:
-                  type: string
-                file:
-                  type: string
-                  format: binary
+              $ref: '#/components/schemas/postDocument_request'
       responses:
-        200:
-          description: "Document successfully uploaded."
-        400:
-          description: "Document upload failed due to bad request!"
+        "200":
+          description: Document successfully uploaded.
+        "400":
+          description: Document upload failed due to bad request!
+      summary: Upload a document
+      x-content-type: multipart/form-data
+      x-accepts:
+        - application/json
   /api/documents:
     get:
-      summary: "Return a list of documents"
       operationId: getDocuments
       responses:
-        200:
-          description: "Success"
+        "200":
           content:
-            "application/json":
+            application/json:
               schema:
                 $ref: '#/components/schemas/documents'
-  /api/documents/{id}:
+          description: Success
+      summary: Return a list of documents
+      x-accepts:
+        - application/json
+  /api/documents/{search}:
     get:
-      summary: "Retrieve a document by id"
-      operationId: getDocument
+      operationId: getDocumentsSearch
       parameters:
-        - name: id
+        - description: The search term of the document
+          explode: false
           in: path
+          name: search
           required: true
           schema:
-            type: integer
-          description: The id of the document
+            type: string
+          style: simple
       responses:
-        200:
-          description: "Success"
+        "200":
           content:
-            "application/json":
+            application/json:
               schema:
-                $ref: '#/components/schemas/document'
-        404:
-          description: "Document does not exist with this id!"
-    put:
-      summary: "Update a document by id"
-      operationId: updateDocument
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: The id of the Document
-      responses:
-        200:
-          description: "Document updated successfully"
-        404:
-          description: "Document does not exist with this id!"
+                $ref: '#/components/schemas/documents'
+          description: Success
+      summary: Return a list of documents
+      x-accepts:
+        - application/json
+  /api/documents/{id}:
     delete:
-      summary: "Delete a document by id"
       operationId: deleteDocument
       parameters:
-        - name: id
+        - description: The id of the document
+          explode: false
           in: path
+          name: id
           required: true
           schema:
             type: integer
-          description: The id of the document
+          style: simple
       responses:
-        204:
-          description: "Document deleted successfully"
-        404:
-          description: "Document does not exist with this id!"
+        "204":
+          description: Document deleted successfully
+        "404":
+          description: Document does not exist with this id!
+      summary: Delete a document by id
+      x-accepts:
+        - application/json
+    get:
+      operationId: getDocument
+      parameters:
+        - description: The id of the document
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/document'
+          description: Success
+        "404":
+          description: Document does not exist with this id!
+      summary: Retrieve a document by id
+      x-accepts:
+        - application/json
+    put:
+      operationId: updateDocument
+      parameters:
+        - description: The id of the Document
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          style: simple
+      responses:
+        "200":
+          description: Document updated successfully
+        "404":
+          description: Document does not exist with this id!
+      summary: Update a document by id
+      x-accepts:
+        - application/json
 components:
   schemas:
     document:
-      type: object
+      example:
+        author: author
+        created: created
+        id: 0
+        title: title
       properties:
         id:
+          description: The id of the document
           type: integer
-          description: "The id of the document"
         title:
+          description: The title of the document
           type: string
-          description: "The title of the document"
         author:
+          description: The author of the document's contents
           type: string
-          description: "The author of the document's contents"
         created:
           type: string
-        content:
-          type: string
-          description: "The content of the document"
       required:
         - title
     documents:
-      type: array
       items:
         $ref: '#/components/schemas/document'
+      type: array
+    postDocument_request:
+      properties:
+        document:
+          type: string
+        file:
+          format: binary
+          type: string

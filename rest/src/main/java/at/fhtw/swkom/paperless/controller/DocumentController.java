@@ -3,6 +3,7 @@ package at.fhtw.swkom.paperless.controller;
 import at.fhtw.swkom.paperless.config.RabbitMQConfig;
 import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.services.DocumentService;
+import at.fhtw.swkom.paperless.services.ElasticsearchService;
 import at.fhtw.swkom.paperless.services.FileStorageImpl;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import at.fhtw.swkom.paperless.services.exception.StorageFileNotFoundException;
@@ -42,13 +43,15 @@ public class DocumentController implements ApiApi {
     private final DocumentService documentService;
     private final RabbitTemplate rabbitTemplate;
     private final FileStorageImpl fileStorage;
+    private final ElasticsearchService elasticsearchService;
 
     @Autowired
-    public DocumentController(NativeWebRequest request, DocumentService documentService, RabbitTemplate rabbitTemplate, FileStorageImpl fileStorage) {
+    public DocumentController(NativeWebRequest request, DocumentService documentService, RabbitTemplate rabbitTemplate, FileStorageImpl fileStorage, ElasticsearchService elasticsearchService) {
         this.request = request;
         this.documentService = documentService;
         this.rabbitTemplate = rabbitTemplate;
         this.fileStorage = fileStorage;
+        this.elasticsearchService = elasticsearchService;
     }
 
     @Override
@@ -184,4 +187,17 @@ public class DocumentController implements ApiApi {
         }
     }
 
+    @Override
+    public ResponseEntity<List<DocumentDTO>> getDocumentsSearch(String search) {
+        try {
+            List<DocumentDTO> results = elasticsearchService.searchDocuments(search);
+
+            if (results.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

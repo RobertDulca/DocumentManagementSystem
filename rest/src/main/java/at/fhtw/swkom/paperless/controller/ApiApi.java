@@ -38,6 +38,43 @@ public interface ApiApi {
     }
 
     /**
+     * GET /api/documents/{search} : Return a list of documents
+     *
+     * @param search The search term of the document (required)
+     * @return Success (status code 200)
+     */
+    @Operation(
+            operationId = "getDocumentsSearch",
+            summary = "Return a list of documents",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success", content = {
+                            @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = DocumentDTO.class)))
+                    })
+            }
+    )
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/api/documents/{search}",
+            produces = { "application/json" }
+    )
+
+    default ResponseEntity<List<DocumentDTO>> getDocumentsSearch(
+            @Parameter(name = "search", description = "The search term of the document", required = true, in = ParameterIn.PATH) @PathVariable("search") String search
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"author\" : \"author\", \"created\" : \"created\", \"id\" : 0, \"title\" : \"title\", \"content\" : \"content\" }, { \"author\" : \"author\", \"created\" : \"created\", \"id\" : 0, \"title\" : \"title\", \"content\" : \"content\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+    /**
      * DELETE /api/documents/{id} : Delete a document by id
      *
      * @param id The id of the document (required)
