@@ -39,6 +39,27 @@ paths:
             "application/json":
               schema:
                 $ref: '#/components/schemas/documents'
+  /api/documents/{search}:
+    get:
+      operationId: getDocumentsSearch
+      parameters:
+        - description: The search term of the document
+          in: path
+          name: search
+          required: true
+          schema:
+            type: string
+          style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/documents'
+          description: Success
+      summary: Return a list of documents
+      x-accepts:
+        - application/json
   /api/documents/{id}:
     get:
       summary: "Retrieve a document by id"

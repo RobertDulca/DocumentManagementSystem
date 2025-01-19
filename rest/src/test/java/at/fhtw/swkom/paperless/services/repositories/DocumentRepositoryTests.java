@@ -4,14 +4,18 @@ import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.persistence.repositories.DocumentRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
+@SpringBootTest
+@TestPropertySource("/application-test.properties")
 class DocumentRepositoryTests {
 
     @Autowired
