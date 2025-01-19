@@ -7,14 +7,11 @@ import at.fhtw.swkom.paperless.services.ElasticsearchService;
 import at.fhtw.swkom.paperless.services.FileStorageImpl;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import at.fhtw.swkom.paperless.services.exception.StorageFileNotFoundException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.Generated;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,6 +88,8 @@ public class DocumentController implements ApiApi {
         logger.info("Received request to fetch documents with search term: {}", search);
 
         try {
+            List<DocumentDTO> combinedResults = new ArrayList<>();
+
             // If a search term is provided, perform a search
             if (search != null && !search.isBlank()) {
                 logger.info("Performing search for documents matching: {}", search);
@@ -101,7 +101,13 @@ public class DocumentController implements ApiApi {
                 }
 
                 logger.info("Successfully found {} documents for search term: {}", results.size(), search);
-                return ResponseEntity.ok(results);
+
+                for (DocumentDTO result : results) {
+                    Optional<DocumentDTO> document = Optional.ofNullable(documentService.load(result.getId()));
+                    document.ifPresent(combinedResults::add);
+                }
+
+                return ResponseEntity.ok(combinedResults);
             }
 
             // If no search term, fetch all documents
