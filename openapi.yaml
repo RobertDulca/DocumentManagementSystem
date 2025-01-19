@@ -28,28 +28,13 @@ paths:
   /api/documents:
     get:
       operationId: getDocuments
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/documents'
-          description: Success
-      summary: Return a list of documents
-      x-accepts:
-        - application/json
-  /api/documents/{search}:
-    get:
-      operationId: getDocumentsSearch
       parameters:
-        - description: The search term of the document
-          explode: false
-          in: path
-          name: search
-          required: true
+        - name: search
+          in: query
+          description: The search term for filtering documents
+          required: false
           schema:
             type: string
-          style: simple
       responses:
         "200":
           content:

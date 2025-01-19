@@ -86,17 +86,42 @@ public class DocumentController implements ApiApi {
     }
 
     @Override
-    public ResponseEntity<List<DocumentDTO>> getDocuments() {
-        logger.info("Received request to fetch all documents");
+    public ResponseEntity<List<DocumentDTO>> getDocuments(String search) {
+        logger.info("Received request to fetch documents with search term: {}", search);
+
         try {
+            // If a search term is provided, perform a search
+            if (search != null && !search.isBlank()) {
+                logger.info("Performing search for documents matching: {}", search);
+                List<DocumentDTO> results = elasticsearchService.searchDocuments(search);
+
+                if (results.isEmpty()) {
+                    logger.info("No documents found for search term: {}", search);
+                    return ResponseEntity.noContent().build();
+                }
+
+                logger.info("Successfully found {} documents for search term: {}", results.size(), search);
+                return ResponseEntity.ok(results);
+            }
+
+            // If no search term, fetch all documents
+            logger.info("Fetching all documents");
             List<DocumentDTO> documents = documentService.loadAll();
+
+            if (documents.isEmpty()) {
+                logger.info("No documents found");
+                return ResponseEntity.noContent().build();
+            }
+
             logger.info("Successfully fetched {} documents", documents.size());
-            return new ResponseEntity<>(documents, HttpStatus.OK);
+            return ResponseEntity.ok(documents);
+
         } catch (Exception e) {
-            logger.error("Error occurred while fetching all documents", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error occurred while fetching documents", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     @Override
     public ResponseEntity<Void> postDocument(String documentTitle, MultipartFile file) {
@@ -184,20 +209,6 @@ public class DocumentController implements ApiApi {
             throw new IllegalArgumentException("Not a valid path");
         } else {
             return path.toString();
-        }
-    }
-
-    @Override
-    public ResponseEntity<List<DocumentDTO>> getDocumentsSearch(String search) {
-        try {
-            List<DocumentDTO> results = elasticsearchService.searchDocuments(search);
-
-            if (results.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(results);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
