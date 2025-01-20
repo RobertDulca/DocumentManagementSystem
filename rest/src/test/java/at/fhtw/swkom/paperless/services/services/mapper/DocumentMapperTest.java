@@ -1,4 +1,4 @@
-package at.fhtw.swkom.paperless.services.mapper;
+package at.fhtw.swkom.paperless.services.services.mapper;
 
 import at.fhtw.swkom.paperless.persistence.entities.Document;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;

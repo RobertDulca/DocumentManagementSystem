@@ -1,7 +1,8 @@
-package at.fhtw.swkom.paperless.services.exception;
+package at.fhtw.swkom.paperless.services.services.exception;
 
 import at.fhtw.swkom.paperless.persistence.repositories.DocumentRepository;
 import at.fhtw.swkom.paperless.services.DocumentServiceImpl;
+import at.fhtw.swkom.paperless.services.exception.StorageException;
 import at.fhtw.swkom.paperless.services.mappers.DocumentMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
