@@ -18,7 +18,7 @@ public class FileStorageImpl implements FileStorage {
     private final MinioClient minioClient;
 
     @Autowired
-    FileStorageImpl(MinIOConfig minIOConfig, MinioClient minioClient) {
+    public FileStorageImpl(MinIOConfig minIOConfig, MinioClient minioClient) {
         this.minIOConfig = minIOConfig;
         this.minioClient = minioClient;
     }

@@ -36,6 +36,9 @@ public class DocumentDTO {
         this.title = title;
     }
 
+    public DocumentDTO(int i, String s, LocalDateTime now, Object o) {
+    }
+
     public DocumentDTO id(Integer id) {
         this.id = id;
         return this;

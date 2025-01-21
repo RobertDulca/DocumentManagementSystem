@@ -11,8 +11,10 @@ import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("elasticsearch")
 public class ElasticsearchConfig
 {
     public static final String DOCUMENTS_INDEX_NAME = "documents";

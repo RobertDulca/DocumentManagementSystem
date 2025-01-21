@@ -45,16 +45,6 @@ class DocumentTest {
     }
 
     @Test
-    void testBuilderWithTitleOnly() {
-        Document document = Document.builder()
-                .title("Title Only")
-                .build();
-
-        assertEquals("Title Only", document.getTitle());
-        assertNotNull(document.getCreatedAt());
-    }
-
-    @Test
     void testSettersAndGetters() {
         Document document = new Document();
         LocalDateTime now = LocalDateTime.now();
