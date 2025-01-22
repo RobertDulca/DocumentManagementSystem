@@ -2,13 +2,10 @@ package at.fhtw.swkom.paperless.services;
 
 import at.fhtw.swkom.paperless.config.ElasticsearchConfig;
 import at.fhtw.swkom.paperless.config.RabbitMQConfig;
-import at.fhtw.swkom.paperless.entities.Document;
 import at.fhtw.swkom.paperless.exception.StorageFileNotFoundException;
 import at.fhtw.swkom.paperless.services.dto.DocumentDTO;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.Result;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -21,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
-import java.util.UUID;
 
 @Component
 @Slf4j
@@ -90,7 +86,7 @@ public class TesseractOcrService implements OcrService {
         }
     }
 
-    private void indexDocumentInElasticsearch(Integer documentId, String content) {
+    public void indexDocumentInElasticsearch(Integer documentId, String content) {
         try {
             DocumentDTO documentDTO = new DocumentDTO();
             documentDTO.setId(documentId);

@@ -35,6 +35,9 @@ public class DocumentDTO {
         this.title = title;
     }
 
+    public DocumentDTO(int i, String testDocument, String testContent) {
+    }
+
     public DocumentDTO id(Integer id) {
         this.id = id;
         return this;
