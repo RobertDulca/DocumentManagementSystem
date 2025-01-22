@@ -62,6 +62,7 @@ public class DocumentController implements ApiApi {
         logger.info("Received request to delete document with ID: {}", id);
         try {
             documentService.delete(id);
+            elasticsearchService.deleteDocumentById(id);
             logger.info("Successfully deleted document with ID: {}", id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
